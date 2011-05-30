@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, Escape!</string>
+    <string name="app_name">Escape</string>
+    <item format="integer" name="decimal_size" type="integer">4</item>
+</resources>
