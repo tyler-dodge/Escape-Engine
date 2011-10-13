@@ -19,8 +19,9 @@ public class Enemy<DataType extends Enemy<DataType>> extends Npc<DataType> imple
 	public NodalTrack trackPoints;
 	
 	public Enemy(Point position, IRotation rotation, RenderSource source,
-			List<ICollision> collision) {
+			List<ICollision> collision, NodalTrack trackPoints) {
 		super(position, rotation, source, collision);
+		this.trackPoints = trackPoints;
 	}
 	
 	public NodalTrack getTrackPoints(){
