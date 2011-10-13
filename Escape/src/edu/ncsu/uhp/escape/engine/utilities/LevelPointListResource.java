@@ -22,6 +22,6 @@ public class LevelPointListResource {
 	}
 	
 	private static ArrayList<Point> convertToArrayList(Point[] points){
-		return (ArrayList<Point>) Arrays.asList(points);
+		return new ArrayList<Point>(Arrays.asList(points));
 	}
 }
