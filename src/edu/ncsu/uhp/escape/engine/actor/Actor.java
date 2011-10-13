@@ -138,5 +138,5 @@ public abstract class Actor<DataType> extends ActionObserver<DataType>
 	 * @return the final position of the actor
 	 */
 	public abstract Point move(IRotation direction);
-
+	
 }
