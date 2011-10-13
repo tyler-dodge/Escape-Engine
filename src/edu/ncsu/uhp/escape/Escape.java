@@ -7,6 +7,9 @@ import edu.ncsu.uhp.escape.engine.Engine;
 import edu.ncsu.uhp.escape.engine.EngineTickCallback;
 import edu.ncsu.uhp.escape.engine.actionresponse.actor.CreateRubbleResponse;
 import edu.ncsu.uhp.escape.engine.actionresponse.actor.FireballCastResponse;
+import edu.ncsu.uhp.escape.engine.actionresponse.actor.TravelTrackOnTickResponse;
+import edu.ncsu.uhp.escape.engine.actor.BaseEnemyBlob;
+import edu.ncsu.uhp.escape.engine.actor.Enemy;
 import edu.ncsu.uhp.escape.engine.actor.Mage;
 import edu.ncsu.uhp.escape.engine.actor.Npc;
 import edu.ncsu.uhp.escape.engine.actor.Tree;
@@ -33,7 +36,7 @@ import android.view.WindowManager;
 public class Escape extends Activity {
 	private Engine engine;
 	private Tree black;
-	private Npc<Mage> white;
+	private Enemy<BaseEnemyBlob> white;
 	private EscapeSurfaceView glSurface;
 	private Thread engineLoopThread;
 	private IRotation rotation;
@@ -138,12 +141,11 @@ public class Escape extends Activity {
 						R.drawable.basic_tree, new Point(5, 5, 0), new Point(
 								-2.5f, -2.5f, 0)), blackBox);
 		black.setResponder(new CreateRubbleResponse<Tree>(getApplicationContext(), black.getResponder()));
-		white = new Mage("White", new Point(5, 5, 0), new ZAxisRotation(0),
+		white = new Enemy<BaseEnemyBlob>(new Point(5, 5, 0), new ZAxisRotation(0),
 				new ImageSource(getApplicationContext(), 0,
 						R.drawable.mage_ani_1, new Point(5, 5, 1), new Point(
-								-2.5f, -2.5f, 5)), whiteBox);
-		white.setResponder(new FireballCastResponse<Mage>(
-				getApplicationContext(), white.getResponder()));
+								-2.5f, -2.5f, 5)), whiteBox, NodalTrack.getInstanceForTrackLevel("FIRST"));
+		white.setResponder(new TravelTrackOnTickResponse<BaseEnemyBlob>(white.getResponder()));
 		rotation = white.getRotation();
 		engine.pushAction(new CreateActorAction(engine, black));
 		engine.pushAction(new CreateActorAction(engine, white));
