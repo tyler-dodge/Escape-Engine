@@ -17,4 +17,7 @@ public class BaseEnemyBlob extends Enemy<BaseEnemyBlob>{
 		// TODO Auto-generated constructor stub
 	}
 
+	public BaseEnemyBlob asDataType() {
+		return this;
+	}
 }
