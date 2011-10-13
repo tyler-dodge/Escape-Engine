@@ -15,7 +15,7 @@ public class LevelPointListResource {
 	public static final Point[] FIRST_LEVEL_POINTS = {new Point(1,1,0), new Point(1,2,0), new Point(1,3,0)};
 	
 	public static ArrayList<Point> getPoints(String level){
-		if(level == "FIRST"){
+		if(level.equals("FIRST")){
 			return convertToArrayList(FIRST_LEVEL_POINTS);
 		}
 		return null;

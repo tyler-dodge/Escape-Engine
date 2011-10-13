@@ -25,7 +25,12 @@ public class TravelTrackOnTickResponse<DataType extends Actor<?> & TrackMovable>
 	public boolean evalAction(DataType owner, Action<?> action) {
 		boolean superResponse = super.evalAction(owner, action);
 		if (action instanceof EngineTickAction) {
+			try{
 			owner.travelOnTrack();
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 		return superResponse;
 	}
