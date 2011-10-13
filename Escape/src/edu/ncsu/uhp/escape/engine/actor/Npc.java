@@ -8,6 +8,7 @@ import edu.ncsu.uhp.escape.engine.actionresponse.actor.*;
 import edu.ncsu.uhp.escape.engine.actor.actions.PostMoveAction;
 import edu.ncsu.uhp.escape.engine.collision.ICollision;
 import edu.ncsu.uhp.escape.engine.utilities.IRotation;
+import edu.ncsu.uhp.escape.engine.utilities.NodalTrack;
 import edu.ncsu.uhp.escape.engine.utilities.RenderSource;
 import edu.ncsu.uhp.escape.engine.utilities.math.*;
 
