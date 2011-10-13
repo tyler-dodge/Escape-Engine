@@ -14,7 +14,7 @@ import edu.ncsu.uhp.escape.engine.utilities.math.Point;
  * @author Brandon Walker
  *
  */
-public class Enemy<DataType extends Enemy<DataType>> extends Npc<DataType> implements TrackMovable {
+public abstract class Enemy<DataType extends Enemy<DataType>> extends Npc<DataType> implements TrackMovable {
 
 	public NodalTrack trackPoints;
 	
@@ -37,12 +37,4 @@ public class Enemy<DataType extends Enemy<DataType>> extends Npc<DataType> imple
 			trackPoints.travel(this);
 		}
 	}
-
-
-	@Override
-	public DataType asDataType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
