@@ -12,7 +12,8 @@ import edu.ncsu.uhp.escape.engine.utilities.math.Point;
  */
 public class LevelPointListResource {
 
-	public static final Point[] FIRST_LEVEL_POINTS = {new Point(1,1,0), new Point(1,2,0), new Point(1,3,0)};
+	public static final Point[] FIRST_LEVEL_POINTS = 
+		{new Point(10, 10, 0), new Point(0, 10, 0), new Point(10, 0, 0)};
 	
 	public static ArrayList<Point> getPoints(String level){
 		if(level.equals("FIRST")){
