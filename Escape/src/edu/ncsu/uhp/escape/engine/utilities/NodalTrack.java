@@ -17,6 +17,8 @@ public class NodalTrack {
 
 	private ArrayList<Point> points;
 	private int trackPosition;
+	boolean hasIterated;
+	boolean hasMoved;
 	
 	public static NodalTrack getInstanceForClass(Npc<?> actor, Point target){
 		return new NodalTrack(TrackPointDictionary.getInstance().getClassPointList(actor, target));
@@ -32,25 +34,25 @@ public class NodalTrack {
 	
 	/**
 	 * Calculates the direction to travel in to reach a certain point. If the angle is the same as the 
-	 * actor's current direction, it will move the actor closer to the point. If the angle changes, as 
-	 * in it has passed or is on the point, the iterator increases, moving the actor towards the next 
+	 * NPC's current direction, it will move the actor closer to the point. If the target gets within a 
+	 * certain distance of the target point the iterator increases, moving the actor towards the next 
 	 * point. If the iterator reaches the end of the list by hitting the last point, trackPosition increases
 	 * to points.size() and movement stops. 
 	 * 
 	 * Therefore all tracks either need to end on a destination that will either destroy (collide) the object 
 	 * or have it move again, either by creating a new NodalTrack or moving it otherwise.
 	 * 
-	 * @param actor The actor to Move
+	 * @param actor The NPC to Move
 	 */
-	public void travel(Actor<?> actor){
+	public void travel(Npc<?> actor){
 		//Currently no 3d support
 		
-		if(points != null && trackPosition <= points.size()){
-	
+		if(points != null && trackPosition < points.size()){
+			
 			Point targetPoint = points.get(trackPosition);
 			Point currentPoint = actor.getPosition();
 			
-			if(targetPoint.equals(currentPoint)){
+			if(targetPoint.equals(currentPoint) || (Math.abs(targetPoint.getX() - currentPoint.getX()) <= actor.getSpeed() && Math.abs(targetPoint.getY() - currentPoint.getY()) <= actor.getSpeed())){
 				trackPosition ++;
 				targetPoint = points.get(trackPosition);
 			}
@@ -62,7 +64,7 @@ public class NodalTrack {
 			// Really really really really
 			// lazy rotational movement
 			float relX = currentPoint.getX() - targetPoint.getX();
-			float relY = currentPoint.getY() - targetPoint.getY();
+			float relY = targetPoint.getY() - currentPoint.getY();
 			float angle = (float) Math.atan(relY / relX) + 3.14f;
 			if (relX == 0 && relY == 0) {
 				angle = 0;
@@ -81,13 +83,6 @@ public class NodalTrack {
 			if (relX < 0) {
 				angle += 3.14;
 			}
-			
-			if(Math.abs(angle - ((ZAxisRotation) actor.getRotation()).getAngle()) < .1f){
-				trackPosition ++;
-				travel(actor);
-				return;
-			}
-			
 			actor.pushAction(new MoveAction(actor, actor.getPosition(), new ZAxisRotation(angle)));
 		}
 	}
