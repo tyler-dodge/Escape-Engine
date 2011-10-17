@@ -13,7 +13,7 @@ import edu.ncsu.uhp.escape.engine.utilities.math.Point;
  *
  */
 public class GravityResponse<DataType extends Actor<?>> extends
-		ActionResponseDecorator<DataType> {
+		SingleEvalActionResponseDecorator<DataType> {
 	private float gravity;
 
 	public GravityResponse(float gravity, IActionResponse<DataType> responder) {
@@ -23,11 +23,10 @@ public class GravityResponse<DataType extends Actor<?>> extends
 
 	@Override
 	public boolean evalAction(DataType owner, Action<?> action) {
-		boolean superResponse = super.evalAction(owner, action);
 		if (action instanceof GravityAction) {
 			owner.applyForce(new Point(0, 0, gravity));
 		}
-		return superResponse;
+		return false;
 	}
 
 	@Override

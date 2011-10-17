@@ -97,7 +97,10 @@ public abstract class ActionObserver<DataType> extends Observable implements
 	 *         if the source is not this actor
 	 */
 	public boolean evalAction(DataType owner, Action<?> action) {
-		return actionResponder.evalAction(owner, action);
+		if (action.getSource().equals(owner))
+			return actionResponder.evalOwnerAction(owner, action);
+		else
+			return actionResponder.evalReceivedAction(owner, action);
 	}
 
 	/**

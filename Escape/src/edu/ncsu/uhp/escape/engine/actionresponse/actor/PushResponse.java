@@ -12,7 +12,7 @@ import edu.ncsu.uhp.escape.engine.actor.actions.PushAction;
  *
  */
 public class PushResponse<DataType extends Actor<?>> extends
-		ActionResponseDecorator<DataType> {
+		SingleEvalActionResponseDecorator<DataType> {
 
 	public PushResponse(IActionResponse<DataType> responder) {
 		super(responder);
@@ -20,14 +20,13 @@ public class PushResponse<DataType extends Actor<?>> extends
 
 	@Override
 	public boolean evalAction(DataType owner, Action<?> action) {
-		boolean superResponse = super.evalAction(owner, action);
 		if (action.getTarget().equals(owner)) {
 			if (action instanceof PushAction) {
 				PushAction pushAction = (PushAction) action;
 				owner.setPosition(pushAction.getTargetPosition());
 			}
 		}
-		return superResponse;
+		return false;
 	}
 	@Override
 	public String toString() {

@@ -20,11 +20,10 @@ public class DieAfterCollisionResponse<DataType extends Actor<?>> extends Action
 	}
 	
 	public boolean evalAction(DataType owner, Action<?> action) {
-		boolean superResponse = super.evalAction(owner, action);
 		if (action instanceof PushAction) {
 			owner.pushAction(new DieAction(owner, owner));
 		}
-		return superResponse;
+		return false;
 	}
 
 }
