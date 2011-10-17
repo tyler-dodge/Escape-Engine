@@ -14,8 +14,8 @@ import edu.ncsu.uhp.escape.engine.actor.actions.Action;
  *            decorators must reference the same DataType when being applied.
  *            (Compiler will not let you mix types with this.)
  */
-public abstract class ActionResponseDecorator<DataType>
-		implements IActionResponse<DataType> {
+public abstract class ActionResponseDecorator<DataType> implements
+		IActionResponse<DataType> {
 	private IActionResponse<DataType> actionResponder;
 
 	public ActionResponseDecorator(IActionResponse<DataType> responder) {
@@ -26,8 +26,12 @@ public abstract class ActionResponseDecorator<DataType>
 	 * All children should call their super evalAction, otherwise decorator
 	 * pattern is not happening
 	 */
-	public boolean evalAction(DataType owner, Action<?> action) {
-		return actionResponder.evalAction(owner, action);
+	public boolean evalOwnerAction(DataType owner, Action<?> action) {
+		return actionResponder.evalOwnerAction(owner, action);
+	}
+
+	public boolean evalReceivedAction(DataType owner, Action<?> action) {
+		return actionResponder.evalReceivedAction(owner, action);
 	}
 
 	public String toString() {

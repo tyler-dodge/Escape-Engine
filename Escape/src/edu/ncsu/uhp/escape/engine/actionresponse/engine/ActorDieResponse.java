@@ -3,6 +3,7 @@ package edu.ncsu.uhp.escape.engine.actionresponse.engine;
 import edu.ncsu.uhp.escape.engine.Engine;
 import edu.ncsu.uhp.escape.engine.actionresponse.ActionResponseDecorator;
 import edu.ncsu.uhp.escape.engine.actionresponse.IActionResponse;
+import edu.ncsu.uhp.escape.engine.actionresponse.SingleEvalActionResponseDecorator;
 import edu.ncsu.uhp.escape.engine.actor.Actor;
 import edu.ncsu.uhp.escape.engine.actor.actions.Action;
 import edu.ncsu.uhp.escape.engine.actor.actions.DieAction;
@@ -15,7 +16,7 @@ import edu.ncsu.uhp.escape.engine.actor.actions.DieAction;
  *
  */
 public class ActorDieResponse<DataType extends Engine> extends
-		ActionResponseDecorator<DataType> {
+		SingleEvalActionResponseDecorator<DataType> {
 
 	public ActorDieResponse(IActionResponse<DataType> responder) {
 		super(responder);
@@ -23,13 +24,12 @@ public class ActorDieResponse<DataType extends Engine> extends
 
 	@Override
 	public boolean evalAction(DataType owner, Action<?> action) {
-		boolean superResponse = super.evalAction(owner, action);
 		if (action instanceof DieAction) {
 			DieAction dieAction = (DieAction) action;
 			Actor<?> actor = dieAction.getData();
 			owner.removeActor(actor);
 		}
-		return superResponse;
+		return false;
 	}
 
 }

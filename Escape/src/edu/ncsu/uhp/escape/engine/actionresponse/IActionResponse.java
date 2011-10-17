@@ -11,5 +11,6 @@ import edu.ncsu.uhp.escape.engine.actor.actions.Action;
  *            the type that the owner is.
  */
 public interface IActionResponse<DataType> {
-	public boolean evalAction(DataType owner, Action<?> action);
+	public boolean evalOwnerAction(DataType owner, Action<?> action);
+	public boolean evalReceivedAction(DataType owner, Action<?> action);
 }

@@ -26,7 +26,7 @@ import edu.ncsu.uhp.escape.engine.utilities.math.Point;
  *
  */
 public class FireballCastResponse<DataType extends Actor<?>> extends
-		ActionResponseDecorator<DataType> {
+		SingleEvalActionResponseDecorator<DataType> {
 	private Context context;
 
 	public FireballCastResponse(Context context,
@@ -37,7 +37,6 @@ public class FireballCastResponse<DataType extends Actor<?>> extends
 
 	@Override
 	public boolean evalAction(DataType owner, Action<?> action) {
-		boolean superResponse = super.evalAction(owner, action);
 		if (action instanceof FireballCastAction) {
 			FireballCastAction fireballAction = (FireballCastAction) action;
 			BoxCollision collisionBox = new BoxCollision(new Point(5, 5, 5),
@@ -53,7 +52,7 @@ public class FireballCastResponse<DataType extends Actor<?>> extends
 
 			owner.pushAction(new CreateActorAction(owner, fireball));
 		}
-		return superResponse;
+		return false;
 	}
 
 }

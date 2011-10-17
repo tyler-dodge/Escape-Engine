@@ -27,7 +27,7 @@ import edu.ncsu.uhp.escape.engine.utilities.math.Point;
  *
  */
 public class CreateRubbleResponse<DataType extends Actor<?>> extends
-		ActionResponseDecorator<DataType> {
+		SingleEvalActionResponseDecorator<DataType> {
 	private Context context;
 
 	public CreateRubbleResponse(Context context, IActionResponse<DataType> responder) {
@@ -37,7 +37,6 @@ public class CreateRubbleResponse<DataType extends Actor<?>> extends
 
 	@Override
 	public boolean evalAction(DataType owner, Action<?> action) {
-		boolean superResponse = super.evalAction(owner, action);
 		if (action instanceof CreateRubbleAction) {
 			CreateRubbleAction rubbleAction = (CreateRubbleAction) action;
 			List<ICollision> skillBox = new ArrayList<ICollision>();
@@ -48,7 +47,7 @@ public class CreateRubbleResponse<DataType extends Actor<?>> extends
 			owner.pushAction(new CreateActorAction(owner, rubble));
 			owner.pushAction(new DieAction(owner, owner));
 		}
-		return superResponse;
+		return false;
 	}
 
 }

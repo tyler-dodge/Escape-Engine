@@ -14,7 +14,7 @@ import edu.ncsu.uhp.escape.engine.collision.ICollidable;
  * throws a push action which will actually set the actors position.
  * 
  * @author Tyler Dodge
- *
+ * 
  */
 public class MovementResponse<DataType extends Actor<?>> extends
 		ActionResponseDecorator<DataType> {
@@ -24,26 +24,29 @@ public class MovementResponse<DataType extends Actor<?>> extends
 	}
 
 	@Override
-	public boolean evalAction(DataType owner, Action<?> action) {
-		boolean superResponse = super.evalAction(owner, action);
+	public boolean evalOwnerAction(DataType owner, Action<?> action) {
+		boolean superResponse = super.evalOwnerAction(owner, action);
+		if (action instanceof MoveAction) {
+			MoveAction moveAction = (MoveAction) action;
+			owner.move(moveAction.getDirection());
+			PostMoveAction postMove = new PostMoveAction(owner,
+					moveAction.getOriginalPosition(), owner.getPosition());
+			owner.pushAction(postMove);
+		}
+		return superResponse;
+	}
+
+	@Override
+	public boolean evalReceivedAction(DataType owner, Action<?> action) {
+		boolean superResponse = super.evalReceivedAction(owner, action);
 		ActionObserver<?> actionSource = action.getSource();
-		if (actionSource.equals(owner)) {
-			if (action instanceof MoveAction) {
-				MoveAction moveAction = (MoveAction) action;
-				owner.move(moveAction.getDirection());
-				PostMoveAction postMove = new PostMoveAction(owner,
-						moveAction.getOriginalPosition(), owner.getPosition());
-				owner.pushAction(postMove);
-			}
-		} else {
-			if (action instanceof PostMoveAction
-					&& actionSource instanceof ICollidable) {
-				PostMoveAction moveAction = (PostMoveAction) action;
-				if (owner.doesCollide((ICollidable) actionSource)) {
-					actionSource.pushAction(new PushAction(owner, actionSource,
-							moveAction.getOriginalPosition()));
-					superResponse = true;
-				}
+		if (action instanceof PostMoveAction
+				&& actionSource instanceof ICollidable) {
+			PostMoveAction moveAction = (PostMoveAction) action;
+			if (owner.doesCollide((ICollidable) actionSource)) {
+				actionSource.pushAction(new PushAction(owner, actionSource,
+						moveAction.getOriginalPosition()));
+				superResponse = true;
 			}
 		}
 		return superResponse;

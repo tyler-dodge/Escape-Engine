@@ -7,6 +7,7 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
+import edu.ncsu.uhp.escape.engine.raster.IRenderParameters;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 
 public class ColorQuad implements IRenderable {
@@ -67,6 +68,11 @@ public class ColorQuad implements IRenderable {
 		offsetX = newOffsets.getX();
 		offsetY = newOffsets.getY();
 		offsetZ = newOffsets.getZ();
+	}
+
+	public IRenderParameters getRenderParameters() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
