@@ -36,5 +36,6 @@ public abstract class Enemy<DataType extends Enemy<DataType>> extends Npc<DataTy
 		if(trackPoints != null){
 			trackPoints.travel(this);
 		}
+
 	}
 }

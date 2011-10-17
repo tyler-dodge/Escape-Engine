@@ -14,7 +14,7 @@ import edu.ncsu.uhp.escape.engine.actor.actions.VelocityTick;
  *
  */
 public class VelocityResponse<DataType extends Actor<?>> extends
-		ActionResponseDecorator<DataType> {
+		SingleEvalActionResponseDecorator<DataType> {
 
 	public VelocityResponse(IActionResponse<DataType> responder) {
 		super(responder);
@@ -22,13 +22,12 @@ public class VelocityResponse<DataType extends Actor<?>> extends
 
 	@Override
 	public boolean evalAction(DataType owner, Action<?> action) {
-		boolean superResponse = super.evalAction(owner, action);
 		if (action.getTarget().equals(owner)) {
 			if (action instanceof VelocityTick) {
 				owner.velocityTick();
 			}
 		}
-		return superResponse;
+		return false;
 	}
 	@Override
 	public String toString() {

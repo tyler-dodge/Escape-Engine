@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
+import edu.ncsu.uhp.escape.engine.raster.IRenderParameters;
 import edu.ncsu.uhp.escape.engine.utilities.IRenderable;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 
@@ -59,5 +60,10 @@ public class CompositeRenderable implements IRenderable {
 			tile.drawGL11(gl);
 		}
 		gl.glPopMatrix();
+	}
+
+	public IRenderParameters getRenderParameters() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

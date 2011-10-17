@@ -16,10 +16,12 @@ public class BaseActionResponse<DataType> implements IActionResponse<DataType> {
 	/**
 	 * Always returns false because it does not affect anything.
 	 */
-	public boolean evalAction(DataType owner, Action<?> action) {
+	public boolean evalOwnerAction(DataType owner, Action<?> action) {
 		return false;
 	}
-
+	public boolean evalReceivedAction(DataType owner, Action<?> action) {
+		return false;
+	}
 	@Override
 	public String toString() {
 		return "Responder";

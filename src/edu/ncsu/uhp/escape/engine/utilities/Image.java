@@ -7,6 +7,7 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
+import edu.ncsu.uhp.escape.engine.raster.IRenderParameters;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 
 public class Image implements IRenderable {
@@ -137,5 +138,10 @@ public class Image implements IRenderable {
 		offsetY = offsets.getY();
 		offsetZ = offsets.getZ();
 
+	}
+
+	public IRenderParameters getRenderParameters() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

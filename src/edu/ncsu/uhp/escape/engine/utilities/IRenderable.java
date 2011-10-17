@@ -3,6 +3,7 @@ package edu.ncsu.uhp.escape.engine.utilities;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
+import edu.ncsu.uhp.escape.engine.raster.IRenderParameters;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 
 /**
@@ -44,4 +45,6 @@ public interface IRenderable {
 	 * @param gl
 	 */
 	public void drawGL11(GL11 gl);
+	
+	public IRenderParameters getRenderParameters();
 }

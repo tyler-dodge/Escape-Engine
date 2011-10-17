@@ -2,6 +2,7 @@ package edu.ncsu.uhp.escape.engine.actionresponse.actor;
 
 import edu.ncsu.uhp.escape.engine.actionresponse.ActionResponseDecorator;
 import edu.ncsu.uhp.escape.engine.actionresponse.IActionResponse;
+import edu.ncsu.uhp.escape.engine.actionresponse.SingleEvalActionResponseDecorator;
 import edu.ncsu.uhp.escape.engine.actor.Actor;
 import edu.ncsu.uhp.escape.engine.actor.TrackMovable;
 import edu.ncsu.uhp.escape.engine.actor.actions.Action;
@@ -15,7 +16,7 @@ import edu.ncsu.uhp.escape.engine.actor.actions.EngineTickAction;
  *
  */
 public class TravelTrackOnTickResponse<DataType extends Actor<?> & TrackMovable> extends
-		ActionResponseDecorator<DataType> {
+		SingleEvalActionResponseDecorator<DataType> {
 
 	public TravelTrackOnTickResponse(IActionResponse<DataType> responder) {
 		super(responder);
@@ -23,11 +24,10 @@ public class TravelTrackOnTickResponse<DataType extends Actor<?> & TrackMovable>
 
 	@Override
 	public boolean evalAction(DataType owner, Action<?> action) {
-		boolean superResponse = super.evalAction(owner, action);
 		if (action instanceof EngineTickAction) {
 			owner.travelOnTrack();
 		}
-		return superResponse;
+		return false;
 	}
 
 	@Override
