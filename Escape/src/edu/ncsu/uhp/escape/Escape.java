@@ -153,7 +153,6 @@ public class Escape extends Activity {
 		engineLoopThread.start();
 		engine.setGlSurface(glSurface);
 		engine.setTickCallback(callback);
-		engine.setFollowActor(white);
 	}
 
 	private boolean movePlayer;
