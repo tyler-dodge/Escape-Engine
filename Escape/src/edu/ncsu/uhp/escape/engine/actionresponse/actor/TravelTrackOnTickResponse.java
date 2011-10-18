@@ -1,6 +1,5 @@
 package edu.ncsu.uhp.escape.engine.actionresponse.actor;
 
-import edu.ncsu.uhp.escape.engine.actionresponse.ActionResponseDecorator;
 import edu.ncsu.uhp.escape.engine.actionresponse.IActionResponse;
 import edu.ncsu.uhp.escape.engine.actionresponse.SingleEvalActionResponseDecorator;
 import edu.ncsu.uhp.escape.engine.actor.Actor;
@@ -27,7 +26,7 @@ public class TravelTrackOnTickResponse<DataType extends Actor<?> & TrackMovable>
 		if (action instanceof EngineTickAction) {
 			owner.travelOnTrack();
 		}
-		return false;
+		return true;
 	}
 
 	@Override
