@@ -178,6 +178,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 			actor.evalActions();
 
 		}
+		map.evalActions();
 		evalActions();
 		actorLock.unlock();
 	}
