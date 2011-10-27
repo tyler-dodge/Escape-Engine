@@ -42,4 +42,9 @@ public class ImageSource extends RenderSource {
 		Image newImage = new Image(texturePointer, dimensions, offsets);
 		return newImage;
 	}
+	
+	public Point getOffsets(){
+		return offsets;
+	}
+	
 }
