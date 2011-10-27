@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import edu.ncsu.uhp.escape.engine.actor.Actor;
 import edu.ncsu.uhp.escape.engine.actor.Npc;
 import edu.ncsu.uhp.escape.engine.actor.actions.MoveAction;
+import edu.ncsu.uhp.escape.engine.actor.actions.PostMoveAction;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 
 /**
@@ -17,8 +18,8 @@ public class NodalTrack {
 
 	private ArrayList<Point> points;
 	private int trackPosition;
-	boolean hasIterated;
-	boolean hasMoved;
+	Point targetPoint;
+	Point currentPoint;
 	
 	public static NodalTrack getInstanceForClass(Npc<?> actor, Point target){
 		return new NodalTrack(TrackPointDictionary.getInstance().getClassPointList(actor, target));
@@ -49,11 +50,15 @@ public class NodalTrack {
 		
 		if(points != null && trackPosition < points.size()){
 			
-			Point targetPoint = points.get(trackPosition);
-			Point currentPoint = actor.getPosition();
+			targetPoint = points.get(trackPosition);
+			currentPoint = actor.getPosition();
 			
 			if(targetPoint.equals(currentPoint) || (Math.abs(targetPoint.getX() - currentPoint.getX()) <= actor.getSpeed() && Math.abs(targetPoint.getY() - currentPoint.getY()) <= actor.getSpeed())){
 				trackPosition ++;
+				if(trackPosition == points.size()){
+					return;
+				}
+				
 				targetPoint = points.get(trackPosition);
 			}
 			
@@ -83,7 +88,10 @@ public class NodalTrack {
 			if (relX < 0) {
 				angle += 3.14;
 			}
-			actor.pushAction(new MoveAction(actor, actor.getPosition(), new ZAxisRotation(angle)));
+			actor.move(new ZAxisRotation(angle));
+			PostMoveAction postMove = new PostMoveAction(actor,
+					currentPoint, actor.getPosition());
+			actor.pushAction(postMove);
 		}
 	}
 	

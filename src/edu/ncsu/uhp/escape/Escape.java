@@ -12,6 +12,7 @@ import edu.ncsu.uhp.escape.engine.actor.BaseEnemyBlob;
 import edu.ncsu.uhp.escape.engine.actor.Enemy;
 import edu.ncsu.uhp.escape.engine.actor.Mage;
 import edu.ncsu.uhp.escape.engine.actor.Npc;
+import edu.ncsu.uhp.escape.engine.actor.Track;
 import edu.ncsu.uhp.escape.engine.actor.Tree;
 import edu.ncsu.uhp.escape.engine.actor.actions.CreateActorAction;
 import edu.ncsu.uhp.escape.engine.actor.actions.FireballCastAction;
@@ -22,6 +23,8 @@ import edu.ncsu.uhp.escape.engine.utilities.*;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
@@ -35,7 +38,6 @@ import android.view.WindowManager;
  */
 public class Escape extends Activity {
 	private Engine engine;
-	private Tree black;
 	private Enemy<BaseEnemyBlob> white;
 	private EscapeSurfaceView glSurface;
 	private Thread engineLoopThread;
@@ -43,6 +45,7 @@ public class Escape extends Activity {
 	private IRotation spawnRotation;
 	private float centerX = -1;
 	private float centerY = -1;
+	private Enemy<BaseEnemyBlob> track;
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
@@ -128,27 +131,38 @@ public class Escape extends Activity {
 		engine = new Engine(getApplicationContext());
 		glSurface = (EscapeSurfaceView) findViewById(R.id.engineSurface);
 		glSurface.setEngine(engine);
-		BoxCollision collisionBox = new BoxCollision(new Point(5, 5, 5),
-				new Point(-2.5f, -2.5f, 0));
-		List<ICollision> blackBox = new ArrayList<ICollision>();
-		blackBox.add(collisionBox);
+
 		BoxCollision whiteCollision = new BoxCollision(new Point(5, 5, 5),
 				new Point(-2.5f, -2.5f, 0));
 		List<ICollision> whiteBox = new ArrayList<ICollision>();
 		whiteBox.add(whiteCollision);
-		black = new Tree(new Point(0, 0, 0), new ZAxisRotation(0),
-				new ImageSource(getApplicationContext(), 0,
-						R.drawable.basic_tree, new Point(5, 5, 0), new Point(
-								-2.5f, -2.5f, 0)), blackBox);
-		black.setResponder(new CreateRubbleResponse<Tree>(getApplicationContext(), black.getResponder()));
 		white = new BaseEnemyBlob(new Point(5, 5, 0), new ZAxisRotation(0),
 				new ImageSource(getApplicationContext(), 0,
 						R.drawable.mage_ani_1, new Point(5, 5, 1), new Point(
 								-2.5f, -2.5f, 5)), whiteBox, NodalTrack.getInstanceForTrackLevel("FIRST"));
 		white.setResponder(new TravelTrackOnTickResponse<BaseEnemyBlob>(white.getResponder()));
 		rotation = white.getRotation();
-		engine.pushAction(new CreateActorAction(engine, black));
+		
+		/*ArrayList<Point> points = TrackPointDictionary.getInstance().getLevelPointList("FIRST");
+		List<ICollision> trackBox = new ArrayList<ICollision>();
+
+		
+		track = new Track(new ImageSource(getApplicationContext(), 0,
+				R.drawable.track1, new Point(100, 100, 1), new Point(
+						-2.5f, -2.5f, 5)), trackBox, points);
+		
+		engine.addObserver(track);
+		*/
+		track = new BaseEnemyBlob(new Point(0, 0, 2), new ZAxisRotation(1.57f),
+				new ImageSource(getApplicationContext(), 0,
+						R.drawable.track1, new Point(85, 55, 1), new Point(
+								-42, -28, 0)), whiteBox, NodalTrack.getInstanceForTrackLevel("FIRST"));
+		white.setResponder(new TravelTrackOnTickResponse<BaseEnemyBlob>(white.getResponder()));
+		rotation = white.getRotation();
 		engine.pushAction(new CreateActorAction(engine, white));
+		engine.pushAction(new CreateActorAction(engine, track));
+		//engine.setTrack(track);
+		
 		engineLoopThread = new Thread(engine);
 		engineLoopThread.start();
 		engine.setGlSurface(glSurface);
@@ -167,5 +181,12 @@ public class Escape extends Activity {
 						rotation));
 			}
 		}
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.layout.turret_overlay, menu);
+	    return true;
 	}
 }

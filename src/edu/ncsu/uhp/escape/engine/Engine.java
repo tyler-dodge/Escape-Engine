@@ -96,7 +96,8 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 
 	private ArrayList<Actor<?>> actors = new ArrayList<Actor<?>>();
 	private Map<?> map;
-
+	private Track track;
+	
 	/**
 	 * Adds an actor to the engine. Adds all other Actors, the Map, and the
 	 * engine to its Observer list.
@@ -162,10 +163,8 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		addPendingActors();
 		removePendingActors();
 		Action<?>[] actions = createEngineIterationActions();
-		for (int i = 0; i < 3; i++) {
-			for (Action<?> action : actions) {
-				this.pushAction(action);
-			}
+		for (Action<?> action : actions) {
+			this.pushAction(action);
 		}
 		for (Actor<?> actor : actors) {
 			// Testing to for actor collision, if it does collide, pushes the
@@ -301,6 +300,14 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 				engineSurface.requestRender();
 			limiter.blockUntilOpen();
 		}
+	}
+	
+	public void setTrack(Track track){
+		this.track = track;
+	}
+	
+	public Track getTrack(){
+		return track;
 	}
 
 	@Override

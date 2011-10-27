@@ -79,7 +79,7 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 				offsetZ = -followPosition.getZ();
 				gl.glTranslatef(offsetX, offsetY, offsetZ);
 			}
-			gl.glTranslatef(0.0f, 0.0f, -50);
+			gl.glTranslatef(1, 1, -100);
 			Queue<RenderableData> renderables = engine.getRenderables(gl);
 
 			if (version.equals("OpenGL ES-CM 1.1"))
