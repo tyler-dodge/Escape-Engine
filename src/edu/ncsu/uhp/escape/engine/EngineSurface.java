@@ -114,7 +114,7 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 		gl.glViewport(0, 0, width, height);
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		GLU.gluPerspective(gl, 45.0f, (float) width / height, 0.1f, 100.0f);
-		gl.glTranslatef(1, 0, 0);
+		gl.glTranslatef(1, 1, 0);
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 	}
 
