@@ -15,7 +15,7 @@ import android.opengl.*;
  * OpenGL goodness
  * 
  * @author Tyler Dodge
- *
+ * 
  */
 public class EngineSurface implements GLSurfaceView.Renderer {
 	private Engine engine;
@@ -65,6 +65,8 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 	}
 
 	public void onDrawFrame(GL10 gl) {
+		Profiler.getInstance().incrementFrame();
+		Profiler.getInstance().startSection("Draw frame");
 		if (version == "")
 			version = gl.glGetString(GL10.GL_VERSION);
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
@@ -79,7 +81,7 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 				offsetZ = -followPosition.getZ();
 				gl.glTranslatef(offsetX, offsetY, offsetZ);
 			}
-			gl.glTranslatef(1, 1, -100);
+			gl.glTranslatef(0, 0, -50);
 			Queue<RenderableData> renderables = engine.getRenderables(gl);
 
 			if (version.equals("OpenGL ES-CM 1.1"))
@@ -88,11 +90,13 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 				renderList(new TargetGL10(gl), renderables);
 
 		}
+		Profiler.getInstance().endSection();
 
 	}
 
 	private void renderList(IRenderTargetFramework framework,
 			Queue<RenderableData> renderables) {
+		Profiler.getInstance().startSection("Render list");
 		while (!renderables.isEmpty()) {
 			RenderableData data = renderables.remove();
 			framework.getGl().glPushMatrix();
@@ -103,12 +107,14 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 			framework.render(data.getRenderable());
 			framework.getGl().glPopMatrix();
 		}
+		Profiler.getInstance().endSection();
 	}
 
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		gl.glViewport(0, 0, width, height);
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		GLU.gluPerspective(gl, 45.0f, (float) width / height, 0.1f, 100.0f);
+		gl.glTranslatef(1, 0, 0);
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 	}
 
