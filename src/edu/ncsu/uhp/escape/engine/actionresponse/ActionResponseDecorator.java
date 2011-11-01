@@ -34,6 +34,7 @@ public abstract class ActionResponseDecorator<DataType> implements
 		return actionResponder.evalReceivedAction(owner, action);
 	}
 
+	@Override
 	public String toString() {
 		return actionResponder.toString();
 	}

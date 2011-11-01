@@ -3,7 +3,6 @@ package edu.ncsu.uhp.escape.engine.actor;
 import java.util.List;
 
 import edu.ncsu.uhp.escape.engine.actionresponse.IActionResponse;
-import edu.ncsu.uhp.escape.engine.actionresponse.actor.CreateRubbleResponse;
 import edu.ncsu.uhp.escape.engine.actionresponse.actor.TreeBurnAfterImpactResponse;
 import edu.ncsu.uhp.escape.engine.collision.ICollision;
 import edu.ncsu.uhp.escape.engine.utilities.IRotation;

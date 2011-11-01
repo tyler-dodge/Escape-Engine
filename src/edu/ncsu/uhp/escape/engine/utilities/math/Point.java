@@ -116,6 +116,7 @@ public class Point {
 		return new Point(this.x / scalar, this.y / scalar, this.z / scalar);
 	}
 
+	@Override
 	public String toString() {
 		return "[" + x + ", " + y + ", " + z + "]";
 	}

@@ -51,6 +51,7 @@ public class Warrior extends PlayerClass<Warrior> {
 	}
 	
 
+	@Override
 	public SkillTree generateSkillTree() {
 		return new SkillTree(getSkillTreeHash(), ClassName.WARRIOR);
 	}

@@ -7,14 +7,12 @@ import android.content.Context;
 
 import edu.ncsu.uhp.escape.R;
 import edu.ncsu.uhp.escape.engine.actor.Actor;
-import edu.ncsu.uhp.escape.engine.actor.Fireball;
 import edu.ncsu.uhp.escape.engine.actor.Rubble;
 import edu.ncsu.uhp.escape.engine.actor.actions.Action;
 import edu.ncsu.uhp.escape.engine.actor.actions.CreateActorAction;
 import edu.ncsu.uhp.escape.engine.actor.actions.CreateRubbleAction;
 import edu.ncsu.uhp.escape.engine.actor.actions.DieAction;
 import edu.ncsu.uhp.escape.engine.actionresponse.*;
-import edu.ncsu.uhp.escape.engine.collision.BoxCollision;
 import edu.ncsu.uhp.escape.engine.collision.ICollision;
 import edu.ncsu.uhp.escape.engine.utilities.ImageSource;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;

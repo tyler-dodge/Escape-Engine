@@ -50,6 +50,7 @@ public class Mage extends PlayerClass<Mage> {
 				new MageStats());
 	}
 
+	@Override
 	public SkillTree generateSkillTree() {
 		return new SkillTree(getSkillTreeHash(), ClassName.MAGE);
 	}

@@ -49,6 +49,7 @@ public class Rogue extends PlayerClass<Rogue> {
 		super(name, className, position, rotation, source, collision, new RogueStats());
 	}
 	
+	@Override
 	public SkillTree generateSkillTree() {
 		return new SkillTree(getSkillTreeHash(), ClassName.ROGUE);
 	}
