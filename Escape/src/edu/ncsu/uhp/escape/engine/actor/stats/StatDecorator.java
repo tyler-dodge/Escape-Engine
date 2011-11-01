@@ -73,6 +73,7 @@ public abstract class StatDecorator implements IStats {
 		else return 0 + stats.get(name);
 	}
 	
+	@Override
 	public String toString() {
 		return name + " [" + stats.toString() + " ]";
 	}

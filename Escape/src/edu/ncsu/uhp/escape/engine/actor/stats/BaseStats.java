@@ -45,6 +45,7 @@ public class BaseStats implements IStats {
 		else return 0;
 	}
 	
+	@Override
 	public String toString() {
 		return name;
 	}

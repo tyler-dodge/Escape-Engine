@@ -53,6 +53,7 @@ public class GridImageSource extends RenderSource {
 		}
 	}
 
+	@Override
 	public IRenderable loadData(GL10 gl) {
 		// gl.glEnable(GL10.GL_ALPHA);
 

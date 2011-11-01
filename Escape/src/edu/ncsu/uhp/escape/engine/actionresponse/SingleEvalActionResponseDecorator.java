@@ -13,11 +13,13 @@ extends ActionResponseDecorator<DataType> {
 	 * All children should call their super evalAction, otherwise decorator
 	 * pattern is not happening
 	 */
+	@Override
 	public boolean evalOwnerAction(DataType owner, Action<?> action) {
 		boolean superResponse=super.evalOwnerAction(owner, action);
 		return evalAction(owner,action) || superResponse;
 	}
 	
+	@Override
 	public boolean evalReceivedAction(DataType owner, Action<?> action) {
 		boolean superResponse=super.evalReceivedAction(owner, action);
 		return evalAction(owner,action) || superResponse;

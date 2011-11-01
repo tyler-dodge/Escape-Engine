@@ -2,9 +2,7 @@ package edu.ncsu.uhp.escape.engine.utilities;
 
 import java.util.ArrayList;
 
-import edu.ncsu.uhp.escape.engine.actor.Actor;
 import edu.ncsu.uhp.escape.engine.actor.Npc;
-import edu.ncsu.uhp.escape.engine.actor.actions.MoveAction;
 import edu.ncsu.uhp.escape.engine.actor.actions.PostMoveAction;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 

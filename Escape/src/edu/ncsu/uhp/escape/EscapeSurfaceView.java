@@ -24,5 +24,8 @@ public class EscapeSurfaceView extends GLSurfaceView {
 	{
 		renderer.setEngine(engine);
 	}
-
+	
+	public EngineSurface getRenderer(){
+		return renderer;
+	}
 }
