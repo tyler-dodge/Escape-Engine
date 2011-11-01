@@ -8,7 +8,6 @@ import edu.ncsu.uhp.escape.engine.actionresponse.actor.*;
 import edu.ncsu.uhp.escape.engine.actor.actions.PostMoveAction;
 import edu.ncsu.uhp.escape.engine.collision.ICollision;
 import edu.ncsu.uhp.escape.engine.utilities.IRotation;
-import edu.ncsu.uhp.escape.engine.utilities.NodalTrack;
 import edu.ncsu.uhp.escape.engine.utilities.RenderSource;
 import edu.ncsu.uhp.escape.engine.utilities.math.*;
 
@@ -31,6 +30,7 @@ public abstract class Npc<DataType extends Actor<DataType>> extends
 		super(position, rotation, source, collision);
 	}
 
+	@Override
 	public IActionResponse<DataType> createDefaultResponse() {
 		IActionResponse<DataType> responder = new BaseActionResponse<DataType>();
 		responder = new MovementResponse<DataType>(responder);

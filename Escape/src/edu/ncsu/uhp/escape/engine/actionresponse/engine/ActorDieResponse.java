@@ -1,7 +1,6 @@
 package edu.ncsu.uhp.escape.engine.actionresponse.engine;
 
 import edu.ncsu.uhp.escape.engine.Engine;
-import edu.ncsu.uhp.escape.engine.actionresponse.ActionResponseDecorator;
 import edu.ncsu.uhp.escape.engine.actionresponse.IActionResponse;
 import edu.ncsu.uhp.escape.engine.actionresponse.SingleEvalActionResponseDecorator;
 import edu.ncsu.uhp.escape.engine.actor.Actor;

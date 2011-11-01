@@ -10,8 +10,6 @@ import edu.ncsu.uhp.escape.engine.actor.Actor;
 import edu.ncsu.uhp.escape.engine.actor.Fireball;
 import edu.ncsu.uhp.escape.engine.actor.actions.Action;
 import edu.ncsu.uhp.escape.engine.actor.actions.CreateActorAction;
-import edu.ncsu.uhp.escape.engine.actor.actions.DieAction;
-import edu.ncsu.uhp.escape.engine.actor.actions.EngineTickAction;
 import edu.ncsu.uhp.escape.engine.actor.actions.FireballCastAction;
 import edu.ncsu.uhp.escape.engine.actionresponse.*;
 import edu.ncsu.uhp.escape.engine.collision.BoxCollision;

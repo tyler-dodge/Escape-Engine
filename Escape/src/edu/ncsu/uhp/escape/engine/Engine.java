@@ -69,6 +69,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	 * Creates a default response that is composed of a CreateActorResponse and
 	 * an ActorDieResponse
 	 */
+	@Override
 	public IActionResponse<Engine> createDefaultResponse() {
 		IActionResponse<Engine> response = new BaseActionResponse<Engine>();
 		response = new CreateActorResponse<Engine>(response);
@@ -90,6 +91,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	/**
 	 * Kills the engine threads and frees resources.
 	 */
+	@Override
 	public void finalize() {
 		isFinalized = true;
 	}

@@ -24,6 +24,7 @@ public class ImageSource extends RenderSource {
 		this.offsets = offsets;
 	}
 
+	@Override
 	public Image loadData(GL10 gl) {
 		// reference from
 		// http://obviam.net/index.php/texture-mapping-opengl-android-displaying-images-using-opengl-and-squares/

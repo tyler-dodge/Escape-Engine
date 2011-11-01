@@ -17,6 +17,7 @@ public class BaseEnemyBlob extends Enemy<BaseEnemyBlob>{
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
 	public BaseEnemyBlob asDataType() {
 		return this;
 	}
