@@ -74,7 +74,11 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 			version = gl.glGetString(GL10.GL_VERSION);
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		if (engine != null) {
+			
 			gl.glLoadIdentity();
+			gl.glTranslatef(-Escape.getWidthX()/2, -Escape.getHeightY()/2, Escape.DISTANCE_FROM_Z);
+			
+			
 			Actor<?> followActor = engine.getFollowActor();
 			if (followActor != null) {
 				Point followPosition = followActor.getPosition();
@@ -84,14 +88,13 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 				offsetZ = -followPosition.getZ();
 				gl.glTranslatef(offsetX, offsetY, offsetZ);
 			}
-			gl.glTranslatef(-Escape.getWidthX()/2, -Escape.getHeightY()/2, Escape.DISTANCE_FROM_Z);
+			
 			Queue<RenderableData> renderables = engine.getRenderables(gl);
 
 			if (version.equals("OpenGL ES-CM 1.1"))
 				renderList(new TargetGL11((GL11) gl), renderables);
 			else
 				renderList(new TargetGL10(gl), renderables);
-
 		}
 		//Profiler.getInstance().endSection();
 
