@@ -64,7 +64,7 @@ public class Escape extends Activity {
 				ratioX = getWidthX() / glSurface.getWidth();
 				ratioY = getHeightY() / glSurface.getHeight();
 				float relX = event.getX() * ratioX;
-				float relY = event.getY() * ratioY;
+				float relY = (glSurface.getHeight() - event.getY()) * ratioY;
 
 				if(selectedTurret){
 					BoxCollision collisionBox = new BoxCollision(new Point(5, 5, 5),
@@ -72,17 +72,17 @@ public class Escape extends Activity {
 					List<ICollision> box = new ArrayList<ICollision>();
 					box.add(collisionBox);
 					
-		        	currentTurret = new BaseAttackTurret(new Point((int) relX, (int) -relY, 0), new ZAxisRotation(0f),
+		        	currentTurret = new BaseAttackTurret(new Point(relX, relY, 0), new ZAxisRotation(0f),
 		    				new ImageSource(getApplicationContext(), 0,
-		    						R.drawable.basic_tree, new Point(5, 5, 1), new Point(
-		    								0, 0, 0)), box);
+		    						R.drawable.basic_tree, new Point(5, 5, 0), new Point(
+		    								-2.5f, -2.5f, 0)), box);
 		     		engine.pushAction(new CreateActorAction(engine, currentTurret));
 		        	placingTurret = true;
 		        	selectedTurret = false;
 				}
 				
 				if(placingTurret){
-					currentTurret.setPosition(new Point((int) relX, -(int) relY, 1));
+					currentTurret.setPosition(new Point(relX, relY, 1));
 				}
 			} else if (event.getAction() == MotionEvent.ACTION_UP) {
 				placingTurret = false;
@@ -171,7 +171,7 @@ public class Escape extends Activity {
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		aspectRatio = (float) metrics.widthPixels / metrics.heightPixels;
-		heightY = (float) Math.tan(FOV/2) * (-DISTANCE_FROM_Z - DISTANCE_FROM_CLOSE_PLANE);
+		heightY = (float) Math.tan(Math.toRadians(FOV)/2) * (-DISTANCE_FROM_Z - DISTANCE_FROM_CLOSE_PLANE) * 2;
 		widthX = heightY * aspectRatio;
 		
 		engineLoopThread = new Thread(engine);
