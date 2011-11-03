@@ -1,6 +1,7 @@
 package edu.ncsu.uhp.escape.engine.actionresponse;
 
 import edu.ncsu.uhp.escape.engine.actor.actions.Action;
+import edu.ncsu.uhp.escape.engine.utilities.Profiler;
 
 /**
  * The basic Decorator for Action Responders. Allows all action response to be
@@ -27,11 +28,17 @@ public abstract class ActionResponseDecorator<DataType> implements
 	 * pattern is not happening
 	 */
 	public boolean evalOwnerAction(DataType owner, Action<?> action) {
-		return actionResponder.evalOwnerAction(owner, action);
+		Profiler.getInstance().startSection("Eval owner action" + actionResponder.toString());
+		boolean doTarget=actionResponder.evalOwnerAction(owner, action);
+		Profiler.getInstance().endSection();
+		return doTarget;
 	}
 
 	public boolean evalReceivedAction(DataType owner, Action<?> action) {
-		return actionResponder.evalReceivedAction(owner, action);
+		Profiler.getInstance().startSection("Eval received action" + actionResponder.toString());
+		boolean doTarget=actionResponder.evalReceivedAction(owner, action);
+		Profiler.getInstance().endSection();
+		return doTarget;
 	}
 
 	@Override

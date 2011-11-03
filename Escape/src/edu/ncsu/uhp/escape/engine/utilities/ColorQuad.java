@@ -43,6 +43,7 @@ public class ColorQuad implements IRenderable {
 	}
 
 	public void drawGL10(GL10 gl) {
+		Profiler.getInstance().startSection("Drawing Color Quad");
 		gl.glPushMatrix();
 		gl.glTranslatef(offsetX, offsetY, offsetZ);
 
@@ -57,6 +58,7 @@ public class ColorQuad implements IRenderable {
 		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnable(GL10.GL_BLEND);
 		gl.glPopMatrix();
+		Profiler.getInstance().endSection();
 	}
 
 	public void drawGL11(GL11 gl) {

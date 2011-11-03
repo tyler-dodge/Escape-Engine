@@ -74,6 +74,7 @@ public class Image implements IRenderable {
 	}
 
 	public void drawGL10(GL10 gl) {
+		Profiler.getInstance().startSection("Drawing Image");
 		load();
 		gl.glPushMatrix();
 		gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -91,9 +92,11 @@ public class Image implements IRenderable {
 		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		gl.glPopMatrix();
+		Profiler.getInstance().endSection();
 	}
 
 	public void drawGL11(GL11 gl) {
+		Profiler.getInstance().startSection("Drawming Image GL11");
 		if (VBO_ID == -1) {
 			load();
 			int[] ids = new int[1];
@@ -122,6 +125,7 @@ public class Image implements IRenderable {
 		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 		gl.glPopMatrix();
+		Profiler.getInstance().endSection();
 	}
 
 	public Point getDimensions() {

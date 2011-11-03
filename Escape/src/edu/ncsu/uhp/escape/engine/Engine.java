@@ -9,6 +9,7 @@ import edu.ncsu.uhp.escape.engine.actor.*;
 import edu.ncsu.uhp.escape.engine.actor.actions.Action;
 import edu.ncsu.uhp.escape.engine.actor.actions.EngineTickAction;
 import edu.ncsu.uhp.escape.engine.actor.actions.GravityAction;
+import edu.ncsu.uhp.escape.engine.utilities.Profiler;
 import edu.ncsu.uhp.escape.engine.utilities.RenderableData;
 import edu.ncsu.uhp.escape.engine.utilities.ZAxisRotation;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
@@ -35,12 +36,14 @@ import edu.ncsu.uhp.escape.engine.map.Map;
 public class Engine extends ActionObserver<Engine> implements Runnable {
 	private EngineTickCallback callback;
 	private boolean isFinalized;
+	private boolean isPaused;
 	private GLSurfaceView engineSurface;
 	private static final int ACTION_CAPACITY = 10;
 	private Actor<?> followActor;
 	private Lock actorLock = new ReentrantLock();
 	private TemporaryActorQueue actorsToBeAdded;
 	private TemporaryActorQueue actorsToBeRemoved;
+	private Thread callingThread;
 
 	/**
 	 * Creates an instance of the engine
@@ -62,9 +65,11 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 
 			}
 		}
-		map = new TileMap(context, new Point(5, 5, 0), tiles);
 	}
-
+	public void changeMap(Map map)
+	{
+		this.map=map;
+	}
 	/**
 	 * Creates a default response that is composed of a CreateActorResponse and
 	 * an ActorDieResponse
@@ -99,7 +104,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	private ArrayList<Actor<?>> actors = new ArrayList<Actor<?>>();
 	private Map<?> map;
 	private Track track;
-	
+
 	/**
 	 * Adds an actor to the engine. Adds all other Actors, the Map, and the
 	 * engine to its Observer list.
@@ -161,6 +166,8 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	 * possibility of actors intercepting engine iteration actions.
 	 */
 	public void loop() {
+		Profiler.getInstance().incrementFrame();
+		Profiler.getInstance().startSection("eval actions");
 		actorLock.lock();
 		addPendingActors();
 		removePendingActors();
@@ -168,6 +175,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		for (Action<?> action : actions) {
 			this.pushAction(action);
 		}
+		Profiler.getInstance().startSection("Eval actor actions");
 		for (Actor<?> actor : actors) {
 			// Testing to for actor collision, if it does collide, pushes the
 			// projectile hit action
@@ -176,12 +184,21 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 			// actor.pushAction(new ProjectileHitAction(actor, followActor,
 			// actor.getPosition()));
 			// }
+			Profiler.getInstance().startSection(
+					actor.toString() + " eval actions");
 			actor.evalActions();
-
+			Profiler.getInstance().endSection();
 		}
-		map.evalActions();
+		Profiler.getInstance().endSection();
+		Profiler.getInstance().startSection("Eval map actions");
+		if (map!=null)
+			map.evalActions();
+		Profiler.getInstance().endSection();
+		Profiler.getInstance().startSection("Engine eval action");
 		evalActions();
+		Profiler.getInstance().endSection();
 		actorLock.unlock();
+		Profiler.getInstance().endSection();
 	}
 
 	/**
@@ -193,6 +210,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	 */
 	public Queue<RenderableData> getRenderables(GL10 gl) {
 		// the additional 1 is for the map
+		Profiler.getInstance().startSection("Generate Renderables list");
 		actorLock.lock();
 		Queue<RenderableData> renderables;
 		renderables = new LinkedList<RenderableData>();
@@ -207,6 +225,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 					.getPosition(), actor.getRotation()));
 		}
 		actorLock.unlock();
+		Profiler.getInstance().endSection();
 		return renderables;
 	}
 
@@ -294,7 +313,8 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	 */
 	public void run() {
 		FrameLimiter limiter = new FrameLimiter();
-		while (!isFinalized) {
+		callingThread = Thread.currentThread();
+		while (!isFinalized && !isPaused) {
 			if (callback != null)
 				callback.tick();
 			loop();
@@ -303,12 +323,20 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 			limiter.blockUntilOpen();
 		}
 	}
-	
-	public void setTrack(Track track){
+
+	public void pause() {
+		isPaused = true;
+	}
+
+	public void unpause() {
+		isPaused = false;
+	}
+
+	public void setTrack(Track track) {
 		this.track = track;
 	}
-	
-	public Track getTrack(){
+
+	public Track getTrack() {
 		return track;
 	}
 

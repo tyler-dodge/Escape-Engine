@@ -11,6 +11,7 @@ import android.opengl.GLU;
 import edu.ncsu.uhp.escape.Escape;
 import edu.ncsu.uhp.escape.engine.actor.Actor;
 import edu.ncsu.uhp.escape.engine.utilities.IRenderable;
+import edu.ncsu.uhp.escape.engine.utilities.Profiler;
 import edu.ncsu.uhp.escape.engine.utilities.RenderableData;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 
@@ -29,7 +30,7 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 
 		public void render(IRenderable renderable);
 	}
-	
+
 	private class TargetGL10 implements IRenderTargetFramework {
 		private GL10 gl;
 
@@ -68,13 +69,12 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 	}
 
 	public void onDrawFrame(GL10 gl) {
-		//Profiler.getInstance().incrementFrame();
-		//Profiler.getInstance().startSection("Draw frame");
+		Profiler.getInstance().incrementFrame();
+		Profiler.getInstance().startSection("Draw frame");
 		if (version == "")
 			version = gl.glGetString(GL10.GL_VERSION);
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		if (engine != null) {
-			
 			gl.glLoadIdentity();
 			gl.glTranslatef(-Escape.getWidthX()/2, -Escape.getHeightY()/2, Escape.DISTANCE_FROM_Z);
 			
@@ -95,14 +95,15 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 				renderList(new TargetGL11((GL11) gl), renderables);
 			else
 				renderList(new TargetGL10(gl), renderables);
+
 		}
-		//Profiler.getInstance().endSection();
+		Profiler.getInstance().endSection();
 
 	}
 
 	private void renderList(IRenderTargetFramework framework,
 			Queue<RenderableData> renderables) {
-		//Profiler.getInstance().startSection("Render list");
+		Profiler.getInstance().startSection("Render list");
 		while (!renderables.isEmpty()) {
 			RenderableData data = renderables.remove();
 			framework.getGl().glPushMatrix();
@@ -113,7 +114,7 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 			framework.render(data.getRenderable());
 			framework.getGl().glPopMatrix();
 		}
-		//Profiler.getInstance().endSection();
+		Profiler.getInstance().endSection();
 	}
 
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
@@ -138,4 +139,5 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 		gl.glBlendFunc(GL10.GL_ONE, GL10.GL_ONE_MINUS_SRC_ALPHA);
 		gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
 	}
+
 }
