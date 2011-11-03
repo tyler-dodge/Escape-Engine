@@ -29,7 +29,7 @@ public abstract class Actor<DataType> extends ActionObserver<DataType>
 	private RenderSource source;
 	private List<ICollision> collision;
 
-	/**
+	/*
 	 * Constructs an actor with position, rotation, source, and an array of
 	 * Collision Types. Action isCreated is enqueued to actions.
 	 * 
@@ -82,9 +82,25 @@ public abstract class Actor<DataType> extends ActionObserver<DataType>
 	public void setVelocity(Point newVelocity) {
 		velocity = newVelocity;
 	}
+	
+	public List<ICollision> getCollision() {
+		return collision;
+	}
+
+	public void setCollision(List<ICollision> collision) {
+		this.collision = collision;
+	}
 
 	public void applyForce(Point force) {
 		velocity.add(force);
+	}
+	
+	public RenderSource getSource() {
+		return source;
+	}
+
+	public void setSource(RenderSource source) {
+		this.source = source;
 	}
 
 	/**

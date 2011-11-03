@@ -19,13 +19,11 @@ import javax.microedition.khronos.opengles.GL10;
  * @author Tyler Dodge
  * 
  */
-public class Track extends ActionObserver<Track> implements ICollidable {
+public class Track extends Actor<Track> {
 
-	private RenderSource source;
-	private List<ICollision> collision;
+
 	private ArrayList<Point> trackPoints;
-	private static IRotation rotation = new ZAxisRotation(0);
-	public static final int ACTION_CAPACITY = 100;
+	private static IRotation rotation = new ZAxisRotation(0f);
 
 	/**
 	 * Constructs an actor with position, rotation, source, and an array of
@@ -40,16 +38,15 @@ public class Track extends ActionObserver<Track> implements ICollidable {
 	 * @param collision
 	 *            List of Collisions used to determine if actors collide
 	 */
-	public Track(RenderSource source, ArrayList<Point> trackPoints) {
-		super(ACTION_CAPACITY);
-		this.source = source;
+	public Track(Point position, RenderSource source, ArrayList<Point> trackPoints) {
+		super(position, rotation, source, null);
 		this.trackPoints = trackPoints;
-		this.collision = calculateCollisionFromPoints(trackPoints);
+		setCollision(calculateCollisionFromPoints());
 	}
-
-	private List<ICollision> calculateCollisionFromPoints(ArrayList<Point> trackPoints){
+	
+	private List<ICollision> calculateCollisionFromPoints(){
 		List<ICollision> collision = new ArrayList<ICollision>();
-		Point offset = ((ImageSource) source).getOffsets();
+		Point offset = ((ImageSource) getSource()).getOffsets();
 		BoxCollision boxCollision;
 		/*for(int i = 0; i < trackPoints.size() - 2;){
 			boxCollision = new BoxCollision(newPoint(trackPoints.get(i).))
@@ -57,41 +54,6 @@ public class Track extends ActionObserver<Track> implements ICollidable {
 		
 		*/
 		return null;
-	}
-	
-	public List<ICollision> getCollisions() {
-		return this.collision;
-	}
-
-	public IRenderable getRenderable(GL10 gl) {
-		return source.getData(gl);
-	}
-
-	/**
-	 * Checks whether or not any of this actor's collision items collide with
-	 * the checkActor's collision items.
-	 * 
-	 * @param checkActor
-	 *            the actor to be checked against
-	 * @return whether or not this actor collides with checkActor
-	 */
-	public boolean doesCollide(ICollidable checkActor) {
-		Point thisPosition = this.getPosition();
-		IRotation thisRotation = this.getRotation();
-		Point otherPosition = checkActor.getPosition();
-		IRotation otherRotation = checkActor.getRotation();
-		// iterates through this actor's collision items
-		if (collision == null || checkActor.getCollisions() == null)
-			return false;
-		for (ICollision collisionItem : collision) {
-			// iterates through other actor's collision items
-			for (ICollision otherCollisionItem : checkActor.getCollisions()) {
-				if (collisionItem.doesCollide(thisPosition, thisRotation,
-						otherCollisionItem, otherPosition, otherRotation))
-					return true;
-			}
-		}
-		return false;
 	}
 
 	public Point getPosition() {
@@ -110,5 +72,10 @@ public class Track extends ActionObserver<Track> implements ICollidable {
 	@Override
 	public IActionResponse<Track> createDefaultResponse() {
 		return new BaseActionResponse<Track>();
+	}
+
+	@Override
+	public Point move(IRotation direction) {
+		return null;
 	}
 }
