@@ -1,6 +1,7 @@
 package edu.ncsu.uhp.escape.engine.actionresponse;
 
 import edu.ncsu.uhp.escape.engine.actor.actions.Action;
+import edu.ncsu.uhp.escape.engine.utilities.Profiler;
 
 public abstract class SingleEvalActionResponseDecorator<DataType> 
 extends ActionResponseDecorator<DataType> {
@@ -16,12 +17,18 @@ extends ActionResponseDecorator<DataType> {
 	@Override
 	public boolean evalOwnerAction(DataType owner, Action<?> action) {
 		boolean superResponse=super.evalOwnerAction(owner, action);
-		return evalAction(owner,action) || superResponse;
+		Profiler.getInstance().startSection("Eval single action"+this.toString());
+		superResponse=evalAction(owner,action) || superResponse;
+		Profiler.getInstance().endSection();
+		return superResponse;
 	}
 	
 	@Override
 	public boolean evalReceivedAction(DataType owner, Action<?> action) {
 		boolean superResponse=super.evalReceivedAction(owner, action);
-		return evalAction(owner,action) || superResponse;
+		Profiler.getInstance().startSection("Eval single action"+this.toString());
+		superResponse=evalAction(owner,action) || superResponse;
+		Profiler.getInstance().endSection();
+		return superResponse;
 	}
 }
