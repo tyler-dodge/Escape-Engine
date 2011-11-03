@@ -103,7 +103,6 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 
 	private ArrayList<Actor<?>> actors = new ArrayList<Actor<?>>();
 	private Map<?> map;
-	private Track track;
 
 	/**
 	 * Adds an actor to the engine. Adds all other Actors, the Map, and the
@@ -330,14 +329,6 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 
 	public void unpause() {
 		isPaused = false;
-	}
-
-	public void setTrack(Track track) {
-		this.track = track;
-	}
-
-	public Track getTrack() {
-		return track;
 	}
 
 	@Override

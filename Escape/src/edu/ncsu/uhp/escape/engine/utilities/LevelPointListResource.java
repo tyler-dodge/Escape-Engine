@@ -14,7 +14,11 @@ public class LevelPointListResource {
 
 	public static final Point[] FIRST_LEVEL_POINTS = 
 		{
-		new Point(0, 0, 0)};
+		new Point(5, 90, 0), new Point(5, 67.5f, 0), new Point(47, 67.5f, 0), 
+		new Point(47, 31.5f, 0), new Point(25, 31.5f, 0), new Point(25, 55, 0),
+		new Point(5, 55, 0), new Point(5, 13, 0), new Point(26, 13, 0),
+		new Point(26, 0, 0)		
+		};
 	
 	public static ArrayList<Point> getPoints(String level){
 		if(level.equals("FIRST")){
