@@ -2,11 +2,17 @@ package edu.ncsu.uhp.escape.engine.actor;
 
 import java.util.List;
 
+import edu.ncsu.uhp.escape.engine.actionresponse.BaseActionResponse;
+import edu.ncsu.uhp.escape.engine.actionresponse.IActionResponse;
+import edu.ncsu.uhp.escape.engine.actionresponse.actor.MovementResponse;
+import edu.ncsu.uhp.escape.engine.actionresponse.actor.PushResponse;
+import edu.ncsu.uhp.escape.engine.actionresponse.actor.TravelTrackOnTickResponse;
 import edu.ncsu.uhp.escape.engine.collision.ICollision;
 import edu.ncsu.uhp.escape.engine.utilities.IRotation;
 import edu.ncsu.uhp.escape.engine.utilities.NodalTrack;
 import edu.ncsu.uhp.escape.engine.utilities.RenderSource;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
+import edu.ncsu.uhp.escape.game.actionresponse.actor.CollisionWithNexusResponse;
 
 /**
  * Enemy is the abstract (Concrete for now) enemy type that implements trackMovable
@@ -22,6 +28,14 @@ public abstract class Enemy<DataType extends Enemy<DataType>> extends Npc<DataTy
 			List<ICollision> collision, NodalTrack trackPoints) {
 		super(position, rotation, source, collision);
 		this.trackPoints = trackPoints;
+	}
+	
+	@Override
+	public IActionResponse<DataType> createDefaultResponse() {
+		IActionResponse<DataType> responder = super.createDefaultResponse();
+		responder = new TravelTrackOnTickResponse<DataType>(responder);
+		responder = new CollisionWithNexusResponse<DataType>(responder);
+		return responder;
 	}
 	
 	public NodalTrack getTrackPoints(){

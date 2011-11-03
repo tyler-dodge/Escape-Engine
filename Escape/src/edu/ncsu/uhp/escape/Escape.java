@@ -9,6 +9,8 @@ import edu.ncsu.uhp.escape.engine.actionresponse.actor.TravelTrackOnTickResponse
 import edu.ncsu.uhp.escape.engine.actor.BaseAttackTurret;
 import edu.ncsu.uhp.escape.engine.actor.BaseEnemyBlob;
 import edu.ncsu.uhp.escape.engine.actor.Enemy;
+import edu.ncsu.uhp.escape.engine.actor.Nexus;
+import edu.ncsu.uhp.escape.engine.actor.Track;
 import edu.ncsu.uhp.escape.engine.actor.Turret;
 import edu.ncsu.uhp.escape.engine.actor.actions.CreateActorAction;
 import edu.ncsu.uhp.escape.engine.actor.actions.FireballCastAction;
@@ -44,7 +46,8 @@ public class Escape extends Activity {
 	private IRotation rotation;
 	private float centerX = -1;
 	private float centerY = -1;
-	private Enemy<BaseEnemyBlob> track;
+	private BaseEnemyBlob track;
+	private Nexus nexus;
 	private boolean placingTurret;
 	private boolean selectedTurret;
 	private Turret<?> currentTurret;
@@ -134,39 +137,29 @@ public class Escape extends Activity {
 		engine = new Engine(getApplicationContext());
 		glSurface = (EscapeSurfaceView) findViewById(R.id.engineSurface);
 		glSurface.setEngine(engine);
+		
+		ArrayList<Point> points = TrackPointDictionary.getInstance().getLevelPointList("FIRST");
+
 
 		BoxCollision whiteCollision = new BoxCollision(new Point(5, 5, 5),
 				new Point(-2.5f, -2.5f, 0));
 		List<ICollision> whiteBox = new ArrayList<ICollision>();
 		whiteBox.add(whiteCollision);
-		white = new BaseEnemyBlob(new Point(20, 20, 0), new ZAxisRotation(0),
+		white = new BaseEnemyBlob(points.get(0), new ZAxisRotation(0),
 				new ImageSource(getApplicationContext(), 0,
 						R.drawable.mage_ani_1, new Point(5, 5, 0), new Point(
-								0f, 0f, 0)), whiteBox, NodalTrack.getInstanceForTrackLevel("FIRST"));
-		white.setResponder(new TravelTrackOnTickResponse<BaseEnemyBlob>(white.getResponder()));
-		rotation = white.getRotation();
-		
-		/*ArrayList<Point> points = TrackPointDictionary.getInstance().getLevelPointList("FIRST");
+								-2.5f, -2.5f, 0)), whiteBox, NodalTrack.getInstanceForTrackLevel("FIRST"));
+		white.setResponder(new TravelTrackOnTickResponse<BaseEnemyBlob>(white.getResponder()));		
 		List<ICollision> trackBox = new ArrayList<ICollision>();
 
-		
-		track = new Track(new ImageSource(getApplicationContext(), 0,
+		/*
+		track = new Track<Track>(new ImageSource(getApplicationContext(), 0,
 				R.drawable.track1, new Point(100, 100, 1), new Point(
 						-2.5f, -2.5f, 5)), trackBox, points);
 		
 		engine.addObserver(track);
-		*/
-				
-		track = new BaseEnemyBlob(new Point(0, 0, 2), new ZAxisRotation(-1.57f),
-				new ImageSource(getApplicationContext(), 0,
-						R.drawable.track1, new Point(0, 0, 1), new Point(
-								0, 0, 0)), whiteBox, NodalTrack.getInstanceForTrackLevel("FIRST"));
-		white.setResponder(new TravelTrackOnTickResponse<BaseEnemyBlob>(white.getResponder()));
-		rotation = white.getRotation();
-		engine.pushAction(new CreateActorAction(engine, white));
-		engine.pushAction(new CreateActorAction(engine, track));
-		//engine.setTrack(track);
-			
+		
+				*/
 		
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -174,6 +167,25 @@ public class Escape extends Activity {
 		heightY = (float) Math.tan(Math.toRadians(FOV)/2) * (-DISTANCE_FROM_Z - DISTANCE_FROM_CLOSE_PLANE) * 2;
 		widthX = heightY * aspectRatio;
 		
+		
+		track = new BaseEnemyBlob(new Point(0, 0, 1), new ZAxisRotation(0f), new ImageSource(getApplicationContext(), 0,
+						R.drawable.track1, new Point(widthX, heightY, 0), new Point(
+								0, 0, 0)), null, null);
+
+		BoxCollision nexusCollision = new BoxCollision(new Point(10, 5, 5),
+				new Point(-5, -2.5f, -2.5f));
+		List<ICollision> nexusBox = new ArrayList<ICollision>();
+		nexusBox.add(nexusCollision);
+		
+		nexus = new Nexus(new Point(widthX/2 - 2, 0, 0), new ZAxisRotation(0f), new ImageSource(getApplicationContext(), 0,
+						R.drawable.nexusdemo, new Point(10, 5, 0), new Point(
+								-5, -2.5f, 0)), nexusBox);
+		
+		engine.pushAction(new CreateActorAction(engine, track));
+		engine.pushAction(new CreateActorAction(engine, nexus));
+		engine.pushAction(new CreateActorAction(engine, white));
+		//engine.setTrack(track);
+			
 		engineLoopThread = new Thread(engine);
 		engineLoopThread.start();
 		engine.setGlSurface(glSurface);
