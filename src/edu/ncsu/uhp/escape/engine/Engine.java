@@ -9,6 +9,7 @@ import edu.ncsu.uhp.escape.engine.actor.*;
 import edu.ncsu.uhp.escape.engine.actor.actions.Action;
 import edu.ncsu.uhp.escape.engine.actor.actions.EngineTickAction;
 import edu.ncsu.uhp.escape.engine.actor.actions.GravityAction;
+import edu.ncsu.uhp.escape.engine.collision.ICollision;
 import edu.ncsu.uhp.escape.engine.utilities.Profiler;
 import edu.ncsu.uhp.escape.engine.utilities.RenderableData;
 import edu.ncsu.uhp.escape.engine.utilities.ZAxisRotation;
@@ -44,6 +45,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	private TemporaryActorQueue actorsToBeAdded;
 	private TemporaryActorQueue actorsToBeRemoved;
 	private Thread callingThread;
+	private static final boolean RENDER_COLLISIONS = true;
 
 	/**
 	 * Creates an instance of the engine
@@ -66,10 +68,11 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 			}
 		}
 	}
-	public void changeMap(Map map)
-	{
-		this.map=map;
+
+	public void changeMap(Map<?> map) {
+		this.map = map;
 	}
+
 	/**
 	 * Creates a default response that is composed of a CreateActorResponse and
 	 * an ActorDieResponse
@@ -190,7 +193,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		}
 		Profiler.getInstance().endSection();
 		Profiler.getInstance().startSection("Eval map actions");
-		if (map!=null)
+		if (map != null)
 			map.evalActions();
 		Profiler.getInstance().endSection();
 		Profiler.getInstance().startSection("Engine eval action");
@@ -222,6 +225,13 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		for (Actor<?> actor : actors) {
 			renderables.add(new RenderableData(actor.getRenderable(gl), actor
 					.getPosition(), actor.getRotation()));
+			if (RENDER_COLLISIONS) {
+				List<ICollision> collisions = actor.getCollisions();
+				for (ICollision coll : collisions) {
+					renderables.add(new RenderableData(coll.getRenderable(gl),
+							actor.getPosition(), actor.getRotation()));
+				}
+			}
 		}
 		actorLock.unlock();
 		Profiler.getInstance().endSection();
