@@ -23,7 +23,7 @@ public class ColorBox implements IRenderable {
 		this.bf = (float) (b / 255.0);
 		this.af = (float) (a / 255.0);
 		this.dimensions = dimensions;
-		this.offsets = offsets;
+		setOffsets(offsets);
 		float dimenX = dimensions.getX();
 		float dimenY = dimensions.getY();
 		float[] quadPoints = { 0.0f, dimenY, 0.0f, 
