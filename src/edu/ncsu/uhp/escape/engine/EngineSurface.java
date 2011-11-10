@@ -76,7 +76,7 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		if (engine != null) {
 			gl.glLoadIdentity();
-			gl.glTranslatef(-Escape.getWidthX()/2, -Escape.getHeightY()/2, Escape.DISTANCE_FROM_Z);
+			gl.glTranslatef(-Escape.getWidthX()/2, -Escape.getHeightY()/2, Escape.distanceZ);
 			
 			
 			Actor<?> followActor = engine.getFollowActor();
@@ -121,7 +121,7 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 		gl.glViewport(0, 0, width, height);
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		
-		GLU.gluPerspective(gl, Escape.FOV, Escape.getAspectRatio(), Escape.DISTANCE_FROM_CLOSE_PLANE, -Escape.DISTANCE_FROM_Z);
+		GLU.gluPerspective(gl, Escape.FOV, Escape.getAspectRatio(), Escape.DISTANCE_FROM_CLOSE_PLANE, -Escape.distanceZ);
 		//gl.glTranslatef(1, 1, 0);
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 	}

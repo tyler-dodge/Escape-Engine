@@ -19,7 +19,7 @@ import javax.microedition.khronos.opengles.GL10;
  * @author Tyler Dodge
  * 
  */
-public class Track extends Actor<Track> {
+public class Track extends Npc<Track> {
 
 
 	private ArrayList<Point> trackPoints;
@@ -41,23 +41,31 @@ public class Track extends Actor<Track> {
 	public Track(Point position, RenderSource source, ArrayList<Point> trackPoints) {
 		super(position, rotation, source, null);
 		this.trackPoints = trackPoints;
-		setCollision(calculateCollisionFromPoints());
+		setCollision(calculateCollisionFromPoints(trackPoints));
 	}
 	
-	private List<ICollision> calculateCollisionFromPoints(){
+	public static List<ICollision> calculateCollisionFromPoints(ArrayList<Point> trackPoints){
 		List<ICollision> collision = new ArrayList<ICollision>();
-		Point offset = ((ImageSource) getSource()).getOffsets();
 		BoxCollision boxCollision;
-		/*for(int i = 0; i < trackPoints.size() - 2;){
-			boxCollision = new BoxCollision(newPoint(trackPoints.get(i).))
+		Point origin;
+		Point dimension;
+		for(int i = 0; i == 0; i++){
+			dimension = new Point(Math.abs(trackPoints.get(i).getX() - trackPoints.get(i+1).getX()), Math.abs(trackPoints.get(i).getY() - trackPoints.get(i+1).getY()), Math.abs(trackPoints.get(i).getZ() - trackPoints.get(i+1).getZ()));
+			
+			if(trackPoints.get(i).getX() != trackPoints.get(i + 1).getX()){
+				origin = (trackPoints.get(i).getX() < trackPoints.get(i + 1).getX())? trackPoints.get(i) : trackPoints.get(i + 1);
+			}
+			else{
+				origin = (trackPoints.get(i).getY() < trackPoints.get(i + 1).getY())? trackPoints.get(i) : trackPoints.get(i + 1); 
+			}
+			dimension = dimension.add(new Point(5, 5, 5));
+			//origin = origin.add(new Point(-2.5f, -2.5f ,0));
+			
+			boxCollision = new BoxCollision(dimension, origin);
+			collision.add(boxCollision);
 		}
 		
-		*/
-		return null;
-	}
-
-	public Point getPosition() {
-		return trackPoints.get(0);
+		return collision;
 	}
 
 	public IRotation getRotation() {
