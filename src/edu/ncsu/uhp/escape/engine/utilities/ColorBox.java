@@ -28,7 +28,13 @@ public class ColorBox implements IRenderable {
 		float dimenY = dimensions.getY();
 		float[] quadPoints = { 0.0f, dimenY, 0.0f, 
 							   dimenX, dimenY, 0.0f,
+							   
+							   dimenX, dimenY, 0.0f,
 				               dimenX, 0.0f, 0.0f, 
+				               
+				               dimenX, 0.0f, 0.0f, 
+				               0.0f, 0.0f, 0.0f ,
+				               
 				               0.0f, 0.0f, 0.0f ,
 				               0.0f, dimenY, 0.0f};
 		buffer = ByteBuffer.allocateDirect(quadPoints.length * 4)
@@ -58,7 +64,7 @@ public class ColorBox implements IRenderable {
 		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, buffer);
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glLineWidth(3);
-		gl.glDrawArrays(GL10.GL_LINE_STRIP, 0, verticesCount);
+		gl.glDrawArrays(GL10.GL_LINES, 0, verticesCount);
 		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnable(GL10.GL_BLEND);
 		gl.glPopMatrix();
