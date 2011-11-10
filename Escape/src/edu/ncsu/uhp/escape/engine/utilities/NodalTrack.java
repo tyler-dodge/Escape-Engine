@@ -87,9 +87,6 @@ public class NodalTrack {
 				angle += 3.14;
 			}
 			actor.move(new ZAxisRotation(angle));
-			PostMoveAction postMove = new PostMoveAction(actor,
-					currentPoint, actor.getPosition());
-			actor.pushAction(postMove);
 		}
 	}
 	

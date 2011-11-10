@@ -32,7 +32,8 @@ public abstract class Enemy<DataType extends Enemy<DataType>> extends Npc<DataTy
 	
 	@Override
 	public IActionResponse<DataType> createDefaultResponse() {
-		IActionResponse<DataType> responder = super.createDefaultResponse();
+		IActionResponse<DataType> responder = new BaseActionResponse<DataType>();
+		responder = new MovementResponse<DataType>(responder);
 		responder = new TravelTrackOnTickResponse<DataType>(responder);
 		responder = new CollisionWithNexusResponse<DataType>(responder);
 		return responder;
