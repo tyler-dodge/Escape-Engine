@@ -25,14 +25,17 @@ public class Profiler {
 		}
 	}
 
+	private static final boolean DO_PROFILE = false;
+
 	private Profiler() {
 		sections = new Stack<Profiler.ProfileSection>();
-		threadId=threadCount++;
+		threadId = threadCount++;
 	}
-	private static int threadCount=0;
-	private int threadId=0;
+
+	private static int threadCount = 0;
+	private int threadId = 0;
 	private Stack<ProfileSection> sections;
-	private static Dictionary<Thread, Profiler> instance=new Hashtable<Thread, Profiler>();
+	private static Dictionary<Thread, Profiler> instance = new Hashtable<Thread, Profiler>();
 	private int frameNum = 0;
 
 	public static Profiler getInstance() {
@@ -49,15 +52,21 @@ public class Profiler {
 	}
 
 	public void startSection(String name) {
-		ProfileSection section = new ProfileSection(name);
-		sections.push(section);
-		Log.d("Frame " + frameNum, "T: "+threadId+" S:" + sections.size()
-				+ " Start Empty \"Starting " + name + "\"");
+		if (DO_PROFILE) {
+			ProfileSection section = new ProfileSection(name);
+			sections.push(section);
+			Log.d("Frame " + frameNum,
+					"T: " + threadId + " S:" + sections.size()
+							+ " Start Empty \"Starting " + name + "\"");
+		}
 	}
 
 	public void endSection() {
-		int size = sections.size();
-		ProfileSection section = sections.pop();
-		Log.d("Frame " + frameNum, "T: "+threadId+" S:" + size + " End " + section.toString());
+		if (DO_PROFILE) {
+			int size = sections.size();
+			ProfileSection section = sections.pop();
+			Log.d("Frame " + frameNum, "T: " + threadId + " S:" + size
+					+ " End " + section.toString());
+		}
 	}
 }
