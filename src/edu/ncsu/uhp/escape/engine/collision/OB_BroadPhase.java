@@ -59,8 +59,10 @@ public class OB_BroadPhase implements IBroadCollision {
 		}
 		if (boxCheckCollision != null) {
 			Point thisCorner = this.dimension;
-			Point checkOffsets = checkPosition.subtract(thisPosition);
-			Point checkCorner = boxCheckCollision.dimension.subtract(checkOffsets);
+			Point checkOffsets = checkPosition.subtract(thisPosition
+					.add(offsets));
+			Point checkCorner = boxCheckCollision.dimension
+					.subtract(checkOffsets.add(boxCheckCollision.offsets));
 			boolean topX = checkOffsets.getX() >= 0;
 			boolean topY = checkOffsets.getY() >= 0;
 			boolean topZ = checkOffsets.getZ() >= 0;
