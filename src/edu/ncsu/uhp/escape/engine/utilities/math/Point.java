@@ -61,7 +61,7 @@ public class Point {
 	 */
 	public Point add(Point point) {
 
-		return add(point.getX(), point.getY(), point.getZ());
+		return add(point.x, point.y, point.z);
 	}
 
 	/**
@@ -88,6 +88,10 @@ public class Point {
 	public Point add(float newX, float newY, float newZ) {
 
 		return new Point(this.x + newX, this.y + newY, this.z + newZ);
+	}
+
+	public Point subtract(Point subtractPoint) {
+		return add(-subtractPoint.x, -subtractPoint.y, -subtractPoint.z);
 	}
 
 	/**
