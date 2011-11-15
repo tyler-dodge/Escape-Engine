@@ -147,13 +147,12 @@ public class AABB_NarrowPhase implements INarrowCollision {
 				thisAngle.negative().apply(box1[i]);
 				thisAngle.negative().apply(box2[i]);
 			}
-			float box1x1 = box1[3].getX() - offsets.getX(); // Left x value
-			float box1x2 = box1[0].getX() - offsets.getX(); // Right x value
-			float box1y1 = box1[0].getY() - offsets.getY(); // Bottom y value
-			float box1y2 = box1[1].getY() - offsets.getY(); // Top y value
-			float box1z1 = box1[0].getZ() - offsets.getZ(); // Lower z value
-			float box1z2 = box1[0].getZ() + this.dimension.getZ()
-					- offsets.getZ(); // Higher
+			float box1x1 = box1[3].getX(); // Left x value
+			float box1x2 = box1[0].getX(); // Right x value
+			float box1y1 = box1[0].getY(); // Bottom y value
+			float box1y2 = box1[1].getY(); // Top y value
+			float box1z1 = box1[0].getZ(); // Lower z value
+			float box1z2 = box1[0].getZ() + this.dimension.getZ(); // Higher
 			// z
 			// value
 			float box2x1, box2x2, box2y1, box2y2;
