@@ -13,6 +13,18 @@ public class AABB_NarrowPhase implements INarrowCollision {
 	private Point dimension;
 	private Point offsets;
 
+	private class ProjectedEdge {
+		public ProjectedEdge(float startX, float startY, float endX, float endY) {
+			this.startX = startX;
+			this.startY = startY;
+			this.endX = endX;
+			this.endY = endY;
+		}
+
+		public float startX, startY;
+		public float endX, endY;
+	}
+
 	/**
 	 * Constructs a Collision Box from the Points dimension and offsets.
 	 * 
@@ -64,56 +76,55 @@ public class AABB_NarrowPhase implements INarrowCollision {
 		return vertices;
 	}
 
-	/**
-	 * Finds the slope of the edge of the rotated box
-	 * 
-	 * @param point1
-	 * @param point2
-	 * @return The slope of the edge
-	 */
-
-	public float getSlope(Point point1, Point point2) {
-		float slope = 0;
-		if (point1.getX() >= point2.getX()) {
-			slope = (point1.getY() + (-point2.getY()))
-					/ (point1.getX() - point2.getX());
-		} else {
-			slope = (point2.getY() - point1.getY())
-					/ (point2.getX() - point1.getX());
-		}
-		return slope;
+	private ProjectedEdge[] getOriginProjectedEdges() {
+		ProjectedEdge[] edges = new ProjectedEdge[4];
+		edges[0] = new ProjectedEdge(0f, this.dimension.getX(), 0, 0);
+		edges[1] = new ProjectedEdge(0f, 0, 0, this.dimension.getY());
+		edges[2] = new ProjectedEdge(0f, this.dimension.getX(),
+				this.dimension.getY(), this.dimension.getY());
+		edges[3] = new ProjectedEdge(this.dimension.getX(),
+				this.dimension.getX(), 0f, this.dimension.getY());
+		return edges;
 	}
 
-	/**
-	 * 
-	 * @param slope
-	 * @param point
-	 * @param point1
-	 * @param point2
-	 * @return
-	 */
-
-	public boolean checkSlope(float slope, Point checkPoint, Point point1,
-			Point point2) {
-		boolean intersect = false;
-		float expectedY1 = 0;
-		float expectedY2 = 0;
-		if (point1.getY() <= point2.getY()) {
-			expectedY1 = point1.getY()
-					+ (slope * (checkPoint.getX() - point1.getX()));
-			expectedY2 = point2.getY()
-					+ (slope * (checkPoint.getX() - point2.getX()));
-		} else {
-			expectedY1 = point2.getY()
-					+ (slope * (checkPoint.getX() - point2.getX()));
-			expectedY2 = point1.getY()
-					+ (slope * (checkPoint.getX() - point1.getX()));
+	private ProjectedEdge[] getProjectedEdges(Point position,
+			IRotation rotation, Point relativePosition,
+			IRotation relativeRotation, Point relativeOffset) {
+		ProjectedEdge[] edges = new ProjectedEdge[4];
+		Point[] points = getPoints(position, rotation);
+		for (int i = 0; i < 4; i++) {
+			points[i] = points[i].subtract(relativePosition);
+			points[i] = relativeRotation.negative().apply(points[i]);
+			points[i] = points[i].subtract(relativeOffset);
 		}
-		if (((expectedY1 <= checkPoint.getY()) && (checkPoint.getY() <= expectedY2))
-				|| ((expectedY1 >= checkPoint.getY() && (checkPoint.getY() >= expectedY2)))) {
-			intersect = true;
+		for (int i = 0; i < 4; i++) {
+			float startX;
+			float endX;
+			float startY;
+			float endY;
+			Point point1 = points[i];
+			Point point2;
+			if (i + 1 == 4)
+				point2 = points[0];
+			else
+				point2 = points[i + 1];
+			if (point1.getX() > point2.getX()) {
+				startX = point1.getX();
+				endX = point2.getX();
+			} else {
+				startX = point2.getX();
+				endX = point1.getX();
+			}
+			if (point1.getY() > point2.getY()) {
+				startY = point1.getY();
+				endY = point2.getY();
+			} else {
+				startY = point2.getY();
+				endY = point1.getY();
+			}
+			edges[i] = new ProjectedEdge(startX, startY, endX, endY);
 		}
-		return intersect;
+		return edges;
 	}
 
 	/**
@@ -123,17 +134,6 @@ public class AABB_NarrowPhase implements INarrowCollision {
 			IRotation thisRotation, ICollision checkCollide,
 			Point checkPosition, IRotation checkRotation) {
 		boolean collide = false;
-		Point[] box1 = getPoints(thisPosition, thisRotation);
-		ZAxisRotation thisAngle = new ZAxisRotation(thisRotation.toGlMatrix());
-		ZAxisRotation checkAngle = new ZAxisRotation(checkRotation.toGlMatrix());
-		ZAxisRotation betweenAngle;
-		if (thisAngle.getAngle() >= checkAngle.getAngle()) {
-			betweenAngle = new ZAxisRotation(thisAngle.getAngle()
-					+ -checkAngle.getAngle());
-		} else {
-			betweenAngle = new ZAxisRotation(checkAngle.getAngle()
-					- thisAngle.getAngle());
-		}
 		AABB_NarrowPhase boxCheckCollision = null;
 		if (checkCollide instanceof MultiPhaseCollision) {
 			boxCheckCollision = (AABB_NarrowPhase) ((MultiPhaseCollision) checkCollide).narrow;
@@ -141,76 +141,23 @@ public class AABB_NarrowPhase implements INarrowCollision {
 			boxCheckCollision = (AABB_NarrowPhase) checkCollide;
 		}
 		if (boxCheckCollision != null) {
-			Point[] box2 = boxCheckCollision.getPoints(checkPosition,
-					checkRotation);
-			for (int i = 0; i < box1.length; i++) {
-				thisAngle.negative().apply(box1[i]);
-				thisAngle.negative().apply(box2[i]);
-			}
-			float box1x1 = box1[3].getX(); // Left x value
-			float box1x2 = box1[0].getX(); // Right x value
-			float box1y1 = box1[0].getY(); // Bottom y value
-			float box1y2 = box1[1].getY(); // Top y value
-			float box1z1 = box1[0].getZ(); // Lower z value
-			float box1z2 = box1[0].getZ() + this.dimension.getZ(); // Higher
-			// z
-			// value
-			float box2x1, box2x2, box2y1, box2y2;
-			float box2z1 = box2[0].getZ() - offsets.getZ(); // Lower z value
-			float box2z2 = boxCheckCollision.getDimension().getZ()
-					+ box2[0].getZ() - offsets.getZ(); // Higher z value
-			if (betweenAngle.getAngle() <= Math.PI / 2) {
-				box2x1 = Math.abs(box2[2].getX()); // Left x value
-				box2x2 = Math.abs(box2[0].getX()); // Right x value
-				box2y1 = Math.abs(box2[3].getY()); // Bottom y value
-				box2y2 = Math.abs(box2[1].getY()); // Top y value
-			} else if (betweenAngle.getAngle() <= Math.PI) {
-				box2x1 = Math.abs(box2[1].getX()); // Left x value
-				box2x2 = Math.abs(box2[3].getX()); // Right x value
-				box2y1 = Math.abs(box2[2].getY()); // Bottom y value
-				box2y2 = Math.abs(box2[0].getY()); // Top y value
-			} else if (betweenAngle.getAngle() <= Math.PI + Math.PI / 2) {
-				box2x1 = Math.abs(box2[0].getX()); // Left x value
-				box2x2 = Math.abs(box2[2].getX()); // Right x value
-				box2y1 = Math.abs(box2[3].getY()); // Bottom y value
-				box2y2 = Math.abs(box2[1].getY()); // Top y value
-			} else {
-				box2x1 = Math.abs(box2[3].getX()); // Left x value
-				box2x2 = Math.abs(box2[1].getX()); // Right x value
-				box2y1 = Math.abs(box2[0].getY()); // Bottom y value
-				box2y2 = Math.abs(box2[2].getY()); // Top y value
-			}
-			double offset = Math.cos(betweenAngle.getAngle()) * offsets.getX()
-					+ Math.sin(betweenAngle.getAngle()) * offsets.getY();
-			box2x1 -= offset;
-			box2x2 -= offset;
-			box2y1 -= offset;
-			box2y2 -= offset;
-			if ((box1z1 <= box2z1 && box2z1 <= box1z2)
-					|| (box1z1 <= box2z2 && box2z2 <= box1z2)) {
-				if ((box1x2 <= box2x1 && box2x1 <= box1x1)
-						|| (box1x2 <= box2x2 && box2x2 <= box1x1)) {
-					if ((box1y1 <= box2y1 && box2y1 <= box1y2)
-							|| (box1y1 <= box2y2 && box2y2 <= box1y2)) {
-						if (betweenAngle.getAngle() % ((float) Math.PI / 2) == 0) {
-							collide = true;
-						} else {
-							float slope1 = getSlope(box1[0], box1[3]);
-							float slope2 = getSlope(box1[1], box1[0]);
-							for (int i = 0; i < 3; i++) {
-								if (checkSlope(slope1, box2[i], box1[0],
-										box1[2])) {
-									collide = true;
-									break;
-								}
-								if (checkSlope(slope2, box2[i], box1[1],
-										box1[3])) {
-									collide = true;
-									break;
-								}
-							}
-						}
+			ProjectedEdge[] thisEdges = this.getOriginProjectedEdges();
+			ProjectedEdge[] checkEdges = boxCheckCollision.getProjectedEdges(
+					checkPosition, checkRotation, thisPosition, thisRotation,
+					offsets);
+			for (int y = 0; y < 4; y++) {
+				for (int x = 0; x < 4; x++) {
+					float xCheckEnd = checkEdges[x].endX - thisEdges[y].endX;
+					float xCheckStart = checkEdges[x].endX
+							- thisEdges[y].startX;
+					float yCheckEnd = checkEdges[x].endY - thisEdges[y].endY;
+					float yCheckStart = checkEdges[x].endY
+							- thisEdges[y].startY;
+					if (((xCheckEnd <= checkEdges[x].startX && xCheckEnd >= 0) || (xCheckStart <= checkEdges[x].startX && xCheckStart >= 0))
+							&& ((yCheckEnd <= checkEdges[x].startY && yCheckEnd >= 0) || (yCheckStart <= checkEdges[x].startY && yCheckStart >= 0))) {
+						return true;
 					}
+
 				}
 			}
 		}
