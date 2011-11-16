@@ -5,7 +5,6 @@ import java.util.List;
 
 import edu.ncsu.uhp.escape.engine.Engine;
 import edu.ncsu.uhp.escape.engine.EngineTickCallback;
-import edu.ncsu.uhp.escape.engine.actionresponse.actor.TravelTrackOnTickResponse;
 import edu.ncsu.uhp.escape.engine.actor.BaseAttackTurret;
 import edu.ncsu.uhp.escape.engine.actor.BaseEnemyBlob;
 import edu.ncsu.uhp.escape.engine.actor.Enemy;
@@ -13,23 +12,22 @@ import edu.ncsu.uhp.escape.engine.actor.Nexus;
 import edu.ncsu.uhp.escape.engine.actor.Track;
 import edu.ncsu.uhp.escape.engine.actor.Turret;
 import edu.ncsu.uhp.escape.engine.actor.actions.CreateActorAction;
-import edu.ncsu.uhp.escape.engine.actor.actions.FireballCastAction;
+import edu.ncsu.uhp.escape.engine.actor.actions.CreateObserverAction;
 import edu.ncsu.uhp.escape.engine.actor.actions.MoveAction;
 import edu.ncsu.uhp.escape.engine.collision.BoxCollision;
 import edu.ncsu.uhp.escape.engine.collision.ICollision;
 import edu.ncsu.uhp.escape.engine.utilities.*;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
+import edu.ncsu.uhp.escape.game.actor.Spawner;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 
 /**
  * This is the actual game in terms of setting up the map and actors. GUI events will
@@ -44,8 +42,6 @@ public class Escape extends Activity {
 	private EscapeSurfaceView glSurface;
 	private Thread engineLoopThread;
 	private IRotation rotation;
-	private float centerX = -1;
-	private float centerY = -1;
 	private BaseEnemyBlob track;
 	private Nexus nexus;
 	private boolean placingTurret;
@@ -59,6 +55,7 @@ public class Escape extends Activity {
 	private static final float heightY = 82.75987f;
 	private static float aspectRatio;
 	public static final float DISTANCE_FROM_CLOSE_PLANE = 0.1f;
+	public Spawner spawner;
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
@@ -71,7 +68,7 @@ public class Escape extends Activity {
 
 				if(selectedTurret){
 					BoxCollision collisionBox = new BoxCollision(new Point(5, 5, 5),
-							new Point(0f, 0f, 0));
+							new Point(0f, 0f, 0f));
 					List<ICollision> box = new ArrayList<ICollision>();
 					box.add(collisionBox);
 					
@@ -143,19 +140,6 @@ public class Escape extends Activity {
 		
 		ArrayList<Point> points = TrackPointDictionary.getInstance().getLevelPointList("FIRST");
 
-
-		BoxCollision whiteCollision = new BoxCollision(new Point(5, 5, 3),
-				new Point(-2.5f, -2.5f, -1.5f));
-		List<ICollision> whiteBox = new ArrayList<ICollision>();
-		whiteBox.add(whiteCollision);
-		white = new BaseEnemyBlob(points.get(0), new ZAxisRotation(0),
-				new ImageSource(getApplicationContext(), 0,
-						R.drawable.mage_ani_1, new Point(5, 5, 0), new Point(
-								-2.5f, -2.5f, 0)), whiteBox, NodalTrack.getInstanceForTrackLevel("FIRST"));
-		white.setResponder(new TravelTrackOnTickResponse<BaseEnemyBlob>(white.getResponder()));		
-		List<ICollision> trackBox = new ArrayList<ICollision>();
-
-
 		/*track = new Track(new Point(0,0,1), new ImageSource(getApplicationContext(), 0,
 				R.drawable.track1, new Point(widthX, heightY, 0), new Point(
 						0, 0, 0)), points);*/
@@ -181,10 +165,11 @@ public class Escape extends Activity {
 						R.drawable.nexusdemo, new Point(10, 5, 0), new Point(
 								-5, -2.5f, 0)), nexusBox);
 		
+		spawner = new Spawner(1, "FIRST", getApplicationContext());
+		engine.pushAction(new CreateObserverAction(engine, spawner));
+		
 		engine.pushAction(new CreateActorAction(engine, track));
-		//engine.pushAction(new CreateActorAction(engine, nexus));
-		//engine.pushAction(new CreateActorAction(engine, white));
-		//engine.setTrack(track);
+		engine.pushAction(new CreateActorAction(engine, nexus));
 			
 		engineLoopThread = new Thread(engine);
 		engineLoopThread.start();

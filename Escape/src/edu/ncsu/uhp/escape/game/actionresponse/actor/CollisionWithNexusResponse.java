@@ -1,12 +1,10 @@
 package edu.ncsu.uhp.escape.game.actionresponse.actor;
 
-import edu.ncsu.uhp.escape.engine.actionresponse.ActionResponseDecorator;
 import edu.ncsu.uhp.escape.engine.actionresponse.IActionResponse;
 import edu.ncsu.uhp.escape.engine.actionresponse.SingleEvalActionResponseDecorator;
 import edu.ncsu.uhp.escape.engine.actor.Enemy;
 import edu.ncsu.uhp.escape.engine.actor.Nexus;
 import edu.ncsu.uhp.escape.engine.actor.actions.Action;
-import edu.ncsu.uhp.escape.engine.actor.actions.CollisionAction;
 import edu.ncsu.uhp.escape.engine.actor.actions.PushAction;
 
 /**
