@@ -49,7 +49,6 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	private TemporaryQueue<Actor<?>> actorsToBeRemoved;
 	private TemporaryQueue<ActionObserver<?>> observersToBeAdded;
 	private TemporaryQueue<ActionObserver<?>> observersToBeRemoved;
-	private Thread callingThread;
 	private static final boolean RENDER_COLLISIONS = true;
 
 	/**
@@ -142,11 +141,11 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	public void addActionObserver(ActionObserver<?> newObserver) {
 		observersToBeAdded.enqueue(newObserver);
 	}
-	
+
 	public void removeActionObserver(ActionObserver<?> oldObserver) {
 		observersToBeRemoved.enqueue(oldObserver);
 	}
-	
+
 	/**
 	 * Adds all the actors that are waiting to be added. Used so that the
 	 * addition of actors would be threadsafe, however this method itself is not
@@ -191,7 +190,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 			observers.add(newObserver);
 		}
 	}
-	
+
 	private void removePendingObservers() {
 		while (!observersToBeRemoved.isEmpty()) {
 			ActionObserver<?> newObserver = observersToBeRemoved.dequeue();
@@ -200,7 +199,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 			observers.remove(newObserver);
 		}
 	}
-	
+
 	/**
 	 * Evaluates all the actors' actions, engine's actions, and map's actions.
 	 * Pushes the Engine Iteration Actions onto the engine's stack. These
@@ -346,6 +345,11 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 			isOpen = false;
 		}
 
+		public void finalize() {
+			tickBlocker.cancel();
+			tickBlocker = null;
+		}
+
 		/**
 		 * Waits until tickBlocker's event fires
 		 */
@@ -372,7 +376,6 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	 */
 	public void run() {
 		FrameLimiter limiter = new FrameLimiter();
-		callingThread = Thread.currentThread();
 		while (!isFinalized && !isPaused) {
 			if (callback != null)
 				callback.tick();
@@ -381,6 +384,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 				engineSurface.requestRender();
 			limiter.blockUntilOpen();
 		}
+		limiter.finalize();
 	}
 
 	public void pause() {
