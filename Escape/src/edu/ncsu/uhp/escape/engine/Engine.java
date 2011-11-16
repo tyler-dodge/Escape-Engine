@@ -5,6 +5,8 @@ import edu.ncsu.uhp.escape.engine.actionresponse.BaseActionResponse;
 import edu.ncsu.uhp.escape.engine.actionresponse.IActionResponse;
 import edu.ncsu.uhp.escape.engine.actionresponse.engine.ActorDieResponse;
 import edu.ncsu.uhp.escape.engine.actionresponse.engine.CreateActorResponse;
+import edu.ncsu.uhp.escape.engine.actionresponse.engine.CreateObserverResponse;
+import edu.ncsu.uhp.escape.engine.actionresponse.engine.ObserverRemoveResponse;
 import edu.ncsu.uhp.escape.engine.actor.*;
 import edu.ncsu.uhp.escape.engine.actor.actions.Action;
 import edu.ncsu.uhp.escape.engine.actor.actions.EngineTickAction;
@@ -42,8 +44,11 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	private static final int ACTION_CAPACITY = 10;
 	private Actor<?> followActor;
 	private Lock actorLock = new ReentrantLock();
+	private Lock observerLock = new ReentrantLock();
 	private TemporaryActorQueue actorsToBeAdded;
 	private TemporaryActorQueue actorsToBeRemoved;
+	private TemporaryObserverQueue observersToBeAdded;
+	private TemporaryObserverQueue observersToBeRemoved;
 	private Thread callingThread;
 	private static final boolean RENDER_COLLISIONS = true;
 
@@ -57,6 +62,8 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		super(ACTION_CAPACITY);
 		actorsToBeAdded = new TemporaryActorQueue();
 		actorsToBeRemoved = new TemporaryActorQueue();
+		observersToBeAdded = new TemporaryObserverQueue();
+		observersToBeRemoved = new TemporaryObserverQueue();
 		int sizeX = 20;
 		int sizeY = 20;
 		Tile[][] tiles = new Tile[sizeX][sizeY];
@@ -82,6 +89,8 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		IActionResponse<Engine> response = new BaseActionResponse<Engine>();
 		response = new CreateActorResponse<Engine>(response);
 		response = new ActorDieResponse<Engine>(response);
+		response = new CreateObserverResponse<Engine>(response);
+		response = new ObserverRemoveResponse<Engine>(response);
 		return response;
 	}
 
@@ -105,6 +114,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	}
 
 	private ArrayList<Actor<?>> actors = new ArrayList<Actor<?>>();
+	private ArrayList<ActionObserver<?>> observers = new ArrayList<ActionObserver<?>>();
 	private Map<?> map;
 
 	/**
@@ -129,6 +139,14 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		actorsToBeRemoved.enqueue(newActor);
 	}
 
+	public void addActionObserver(ActionObserver<?> newObserver) {
+		observersToBeAdded.enqueue(newObserver);
+	}
+	
+	public void removeActionObserver(ActionObserver<?> oldObserver) {
+		observersToBeRemoved.enqueue(oldObserver);
+	}
+	
 	/**
 	 * Adds all the actors that are waiting to be added. Used so that the
 	 * addition of actors would be threadsafe, however this method itself is not
@@ -161,6 +179,28 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		}
 	}
 
+	private void addPendingObservers() {
+		while (!observersToBeAdded.isEmpty()) {
+			ActionObserver<?> newObserver = observersToBeAdded.dequeue();
+			newObserver.addObserver(this);
+			this.addObserver(newObserver);
+			for (ActionObserver<?> observer : observers) {
+				newObserver.addObserver(observer);
+				observer.addObserver(newObserver);
+			}
+			observers.add(newObserver);
+		}
+	}
+	
+	private void removePendingObservers() {
+		while (!observersToBeRemoved.isEmpty()) {
+			ActionObserver<?> newObserver = observersToBeRemoved.dequeue();
+			newObserver.deleteObservers();
+			this.deleteObserver(newObserver);
+			observers.remove(newObserver);
+		}
+	}
+	
 	/**
 	 * Evaluates all the actors' actions, engine's actions, and map's actions.
 	 * Pushes the Engine Iteration Actions onto the engine's stack. These
@@ -171,8 +211,11 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		Profiler.getInstance().incrementFrame();
 		Profiler.getInstance().startSection("eval actions");
 		actorLock.lock();
+		observerLock.lock();
 		addPendingActors();
 		removePendingActors();
+		addPendingObservers();
+		removePendingObservers();
 		Action<?>[] actions = createEngineIterationActions();
 		for (Action<?> action : actions) {
 			this.pushAction(action);
@@ -187,8 +230,14 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 			// actor.getPosition()));
 			// }
 			Profiler.getInstance().startSection(
-					actor.toString() + " eval actions");
+					actor.toString() + " eval actions actors");
 			actor.evalActions();
+			Profiler.getInstance().endSection();
+		}
+		for (ActionObserver<?> observer : observers) {
+			Profiler.getInstance().startSection(
+					observer.toString() + " eval actions observers");
+			observer.evalActions();
 			Profiler.getInstance().endSection();
 		}
 		Profiler.getInstance().endSection();
@@ -200,6 +249,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		evalActions();
 		Profiler.getInstance().endSection();
 		actorLock.unlock();
+		observerLock.unlock();
 		Profiler.getInstance().endSection();
 	}
 
@@ -379,4 +429,36 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		}
 	}
 
+	/**
+	 * A thread safe queue used to contain Temporary action observers.
+	 * 
+	 * @author Brandon Walkers
+	 * 
+	 */
+	private class TemporaryObserverQueue {
+		private Queue<ActionObserver<?>> observers;
+		private Lock tempLock;
+
+		public TemporaryObserverQueue() {
+			tempLock = new ReentrantLock();
+			observers = new LinkedList<ActionObserver<?>>();
+		}
+
+		public boolean isEmpty() {
+			return observers.isEmpty();
+		}
+
+		public void enqueue(ActionObserver<?> observer) {
+			tempLock.lock();
+			observers.add(observer);
+			tempLock.unlock();
+		}
+
+		public ActionObserver<?> dequeue() {
+			tempLock.lock();
+			ActionObserver<?> actor = observers.remove();
+			tempLock.unlock();
+			return actor;
+		}
+	}
 }
