@@ -25,12 +25,10 @@ import edu.ncsu.uhp.escape.engine.utilities.math.Point;
  */
 public class FireballCastResponse<DataType extends Actor<?>> extends
 		SingleEvalActionResponseDecorator<DataType> {
-	private Context context;
 
-	public FireballCastResponse(Context context,
+	public FireballCastResponse(
 			IActionResponse<DataType> responder) {
 		super(responder);
-		this.context = context;
 	}
 
 	@Override
@@ -45,7 +43,7 @@ public class FireballCastResponse<DataType extends Actor<?>> extends
 					new Point(5, 0, 0));
 			Fireball fireball = new Fireball(owner.getPosition().add(
 					spawnOffset), fireballAction.getData(), new ImageSource(
-					context, 0, R.drawable.fireball_actor, new Point(5, 5, 0),
+					 0, R.drawable.fireball_actor, new Point(5, 5, 0),
 					new Point(-2.5f, -2.5f, 3)), skillBox);
 
 			owner.pushAction(new CreateActorAction(owner, fireball));

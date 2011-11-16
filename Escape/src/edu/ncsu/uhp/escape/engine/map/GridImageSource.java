@@ -25,7 +25,6 @@ public class GridImageSource extends RenderSource {
 	// private Resources res;
 	private Point tileDimensions, offsets;
 	private ResourceGrid resourceIds;
-	private Context context;
 	private int tileSizePx;
 	private final int TEXTURE_BLOCK_SIZE;
 	private static final int DEFAULT_TEXTURE_BLOCK_SIZE = 512;
@@ -40,7 +39,6 @@ public class GridImageSource extends RenderSource {
 			Point offsets, Point tileDimensions, int tileSizePx,
 			int textureBlockSize) {
 		super(id);
-		this.context = context;
 		this.tileSizePx = tileSizePx;
 		this.resourceIds = resources;
 		this.tileDimensions = tileDimensions;
@@ -54,7 +52,7 @@ public class GridImageSource extends RenderSource {
 	}
 
 	@Override
-	public IRenderable loadData(GL10 gl) {
+	public IRenderable loadData(Context context,GL10 gl) {
 		// gl.glEnable(GL10.GL_ALPHA);
 
 		gl.glEnable(GL10.GL_TEXTURE_2D);

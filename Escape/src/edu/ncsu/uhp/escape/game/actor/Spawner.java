@@ -26,19 +26,17 @@ public class Spawner extends ActionObserver<Spawner>{
 	public static final int ACTION_CAPACITY = 100;
 	private EnemyDictionary enemyDictionary;
 	private String level;
-	private Context context;
 	
-	public Spawner(int capacity, int wave, String level, Context context) {
+	public Spawner(int capacity, int wave, String level) {
 		super(capacity);
 		this.wave = wave;
 		this.level = level;
-		this.context = context;
 		//Always needs to be last
 		this.enemyDictionary = new EnemyDictionary();
 	}
 
-	public Spawner(int wave, String level, Context context){
-		this(ACTION_CAPACITY, wave, level, context);
+	public Spawner(int wave, String level){
+		this(ACTION_CAPACITY, wave, level);
 	}
 	
 	@Override
@@ -78,7 +76,7 @@ public class Spawner extends ActionObserver<Spawner>{
 			
 			for(int i = 0; i < 5; i++){
 				Enemy<BaseEnemyBlob> enemy = new BaseEnemyBlob(points.get(0), new ZAxisRotation(0),
-						new ImageSource(getContext(), 0,
+						new ImageSource(0,
 								R.drawable.mage_ani_1, new Point(5, 5, 0), new Point(
 										-2.5f, -2.5f, 0)), enemyBox, NodalTrack.getInstanceForTrackLevel(getLevel()));
 				queuedEnemies.add(enemy);
@@ -112,13 +110,5 @@ public class Spawner extends ActionObserver<Spawner>{
 	
 	public void setLevel(String level){
 		this.level = level;
-	}
-
-	public Context getContext(){
-		return this.context;
-	}
-	
-	public void setContext(Context context){
-		this.context = context;
 	}
 }

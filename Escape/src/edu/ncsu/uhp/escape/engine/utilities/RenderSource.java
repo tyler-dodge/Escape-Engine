@@ -2,11 +2,13 @@ package edu.ncsu.uhp.escape.engine.utilities;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.content.Context;
+
 /**
  * Holds the RenderSource Id and sourceData
  * 
  * @author Tyler Dodge
- *
+ * 
  */
 public abstract class RenderSource {
 	private int sourceId;
@@ -20,10 +22,11 @@ public abstract class RenderSource {
 		return sourceId;
 	}
 
-	public IRenderable getData(GL10 gl) {
-		if (sourceData==null)
-			sourceData=loadData(gl);
+	public IRenderable getData(Context context, GL10 gl) {
+		if (sourceData == null)
+			sourceData = loadData(context, gl);
 		return sourceData;
 	}
-	public abstract IRenderable loadData(GL10 gl);
+
+	public abstract IRenderable loadData(Context context, GL10 gl);
 }

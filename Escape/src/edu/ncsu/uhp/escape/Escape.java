@@ -94,6 +94,7 @@ public class Escape extends Activity {
 	@Override
 	public void finalize() throws Throwable {
 		super.finalize();
+		finish();
 	}
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
@@ -111,8 +112,7 @@ public class Escape extends Activity {
 				box.add(collisionBox);
 
 				currentTurret = new BaseAttackTurret(new Point(relX, relY, 0),
-						new ZAxisRotation(0f), new ImageSource(
-								getApplicationContext(), 0,
+						new ZAxisRotation(0f), new ImageSource( 0,
 								R.drawable.basic_tree, new Point(5, 5, 0),
 								new Point(-2.5f, -2.5f, 0)), box);
 				engine.pushAction(new CreateActorAction(engine, currentTurret));
@@ -175,7 +175,7 @@ public class Escape extends Activity {
 		widthX = heightY * aspectRatio;
 
 		track = new BaseEnemyBlob(new Point(0, 0, 1), new ZAxisRotation(0f),
-				new ImageSource(getApplicationContext(), 0, R.drawable.track1,
+				new ImageSource(0, R.drawable.track1,
 						new Point(widthX, heightY, 0), new Point(0, 0, 0)),
 				Track.calculateCollisionFromPoints(points), null);
 
@@ -185,11 +185,11 @@ public class Escape extends Activity {
 		nexusBox.add(nexusCollision);
 
 		nexus = new Nexus(new Point(widthX / 2 - 2, 0, 0), new ZAxisRotation(
-				.5f), new ImageSource(getApplicationContext(), 0,
+				.5f), new ImageSource( 0,
 				R.drawable.nexusdemo, new Point(10, 5, 0), new Point(-5, -2.5f,
 						0)), nexusBox);
 
-		spawner = new Spawner(1, "FIRST", getApplicationContext());
+		spawner = new Spawner(1, "FIRST");
 		engine.pushAction(new CreateObserverAction(engine, spawner));
 
 		engine.pushAction(new CreateActorAction(engine, track));
