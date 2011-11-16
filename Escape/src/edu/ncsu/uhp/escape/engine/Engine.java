@@ -45,10 +45,10 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	private Actor<?> followActor;
 	private Lock actorLock = new ReentrantLock();
 	private Lock observerLock = new ReentrantLock();
-	private TemporaryActorQueue actorsToBeAdded;
-	private TemporaryActorQueue actorsToBeRemoved;
-	private TemporaryObserverQueue observersToBeAdded;
-	private TemporaryObserverQueue observersToBeRemoved;
+	private TemporaryQueue<Actor<?>> actorsToBeAdded;
+	private TemporaryQueue<Actor<?>> actorsToBeRemoved;
+	private TemporaryQueue<ActionObserver<?>> observersToBeAdded;
+	private TemporaryQueue<ActionObserver<?>> observersToBeRemoved;
 	private Thread callingThread;
 	private static final boolean RENDER_COLLISIONS = true;
 
@@ -60,10 +60,10 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	 */
 	public Engine(Context context) {
 		super(ACTION_CAPACITY);
-		actorsToBeAdded = new TemporaryActorQueue();
-		actorsToBeRemoved = new TemporaryActorQueue();
-		observersToBeAdded = new TemporaryObserverQueue();
-		observersToBeRemoved = new TemporaryObserverQueue();
+		actorsToBeAdded = new TemporaryQueue<Actor<?>>();
+		actorsToBeRemoved = new TemporaryQueue<Actor<?>>();
+		observersToBeAdded = new TemporaryQueue<ActionObserver<?>>();
+		observersToBeRemoved = new TemporaryQueue<ActionObserver<?>>();
 		int sizeX = 20;
 		int sizeY = 20;
 		Tile[][] tiles = new Tile[sizeX][sizeY];
@@ -402,63 +402,31 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	 * @author Tyler Dodge
 	 * 
 	 */
-	private class TemporaryActorQueue {
-		private Queue<Actor<?>> actors;
+	private class TemporaryQueue<T> {
+		private Queue<T> actors;
 		private Lock tempLock;
 
-		public TemporaryActorQueue() {
+		public TemporaryQueue() {
 			tempLock = new ReentrantLock();
-			actors = new LinkedList<Actor<?>>();
+			actors = new LinkedList<T>();
 		}
 
 		public boolean isEmpty() {
 			return actors.isEmpty();
 		}
 
-		public void enqueue(Actor<?> actor) {
+		public void enqueue(T actor) {
 			tempLock.lock();
 			actors.add(actor);
 			tempLock.unlock();
 		}
 
-		public Actor<?> dequeue() {
+		public T dequeue() {
 			tempLock.lock();
-			Actor<?> actor = actors.remove();
+			T actor = actors.remove();
 			tempLock.unlock();
 			return actor;
 		}
 	}
 
-	/**
-	 * A thread safe queue used to contain Temporary action observers.
-	 * 
-	 * @author Brandon Walkers
-	 * 
-	 */
-	private class TemporaryObserverQueue {
-		private Queue<ActionObserver<?>> observers;
-		private Lock tempLock;
-
-		public TemporaryObserverQueue() {
-			tempLock = new ReentrantLock();
-			observers = new LinkedList<ActionObserver<?>>();
-		}
-
-		public boolean isEmpty() {
-			return observers.isEmpty();
-		}
-
-		public void enqueue(ActionObserver<?> observer) {
-			tempLock.lock();
-			observers.add(observer);
-			tempLock.unlock();
-		}
-
-		public ActionObserver<?> dequeue() {
-			tempLock.lock();
-			ActionObserver<?> actor = observers.remove();
-			tempLock.unlock();
-			return actor;
-		}
-	}
 }

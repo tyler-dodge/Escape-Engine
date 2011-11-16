@@ -56,7 +56,25 @@ public class Escape extends Activity {
 	private static float aspectRatio;
 	public static final float DISTANCE_FROM_CLOSE_PLANE = 0.1f;
 	public Spawner spawner;
-	
+	private boolean isPaused;
+	@Override
+	public void onPause()
+	{
+		engine.pause();
+		isPaused=true;
+	}
+	@Override
+	public void onResume()
+	{
+		if (isPaused) {
+			engine.unpause();
+		}
+	}
+	@Override
+	public void onStop()
+	{
+		engine.finalize();
+	}
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 			if (event.getAction() == MotionEvent.ACTION_DOWN
