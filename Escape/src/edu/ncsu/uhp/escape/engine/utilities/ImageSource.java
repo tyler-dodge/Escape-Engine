@@ -12,12 +12,10 @@ public class ImageSource extends RenderSource {
 	// private Resources res;
 	private Point dimensions, offsets;
 	private int drawableId;
-	private Context context;
 
-	public ImageSource(Context context, int id, int drawableId,
+	public ImageSource(int id, int drawableId,
 			Point dimensions, Point offsets) {
 		super(id);
-		this.context = context;
 		this.drawableId = drawableId;
 		// this.res = context.getResources();
 		this.dimensions = dimensions;
@@ -25,7 +23,7 @@ public class ImageSource extends RenderSource {
 	}
 
 	@Override
-	public Image loadData(GL10 gl) {
+	public Image loadData(Context context, GL10 gl) {
 		// reference from
 		// http://obviam.net/index.php/texture-mapping-opengl-android-displaying-images-using-opengl-and-squares/
 		Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(),

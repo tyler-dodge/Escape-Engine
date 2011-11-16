@@ -50,6 +50,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	private TemporaryQueue<ActionObserver<?>> observersToBeAdded;
 	private TemporaryQueue<ActionObserver<?>> observersToBeRemoved;
 	private static final boolean RENDER_COLLISIONS = true;
+	private Context context;
 
 	/**
 	 * Creates an instance of the engine
@@ -59,20 +60,12 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	 */
 	public Engine(Context context) {
 		super(ACTION_CAPACITY);
+		this.context = context;
 		actorsToBeAdded = new TemporaryQueue<Actor<?>>();
 		actorsToBeRemoved = new TemporaryQueue<Actor<?>>();
 		observersToBeAdded = new TemporaryQueue<ActionObserver<?>>();
 		observersToBeRemoved = new TemporaryQueue<ActionObserver<?>>();
-		int sizeX = 20;
-		int sizeY = 20;
-		Tile[][] tiles = new Tile[sizeX][sizeY];
-		for (int x = 0; x < sizeX; x++) {
-			for (int y = 0; y < sizeY; y++) {
-				tiles[x][y] = Tile
-						.fromSourceId(context, R.drawable.grass_basic);
 
-			}
-		}
 	}
 
 	public void changeMap(Map<?> map) {
@@ -110,6 +103,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	@Override
 	public void finalize() {
 		isFinalized = true;
+		context = null;
 	}
 
 	private ArrayList<Actor<?>> actors = new ArrayList<Actor<?>>();
@@ -268,17 +262,19 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 
 		if (map != null) {
 
-			renderables.add(new RenderableData(map.getRenderable(gl),
+			renderables.add(new RenderableData(map.getRenderable(context, gl),
 					new Point(0, 0, -0.1f), ZAxisRotation.getIdentity()));
 		}
 		for (Actor<?> actor : actors) {
-			renderables.add(new RenderableData(actor.getRenderable(gl), actor
-					.getPosition(), actor.getRotation()));
+			renderables.add(new RenderableData(
+					actor.getRenderable(context, gl), actor.getPosition(),
+					actor.getRotation()));
 			if (RENDER_COLLISIONS) {
 				List<ICollision> collisions = actor.getCollisions();
 				for (ICollision coll : collisions) {
-					renderables.add(new RenderableData(coll.getRenderable(gl),
-							actor.getPosition(), actor.getRotation()));
+					renderables.add(new RenderableData(coll.getRenderable(
+							context, gl), actor.getPosition(), actor
+							.getRotation()));
 				}
 			}
 		}
@@ -346,8 +342,10 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		}
 
 		public void finalize() {
-			tickBlocker.cancel();
-			tickBlocker = null;
+			if (tickBlocker != null) {
+				tickBlocker.cancel();
+				tickBlocker = null;
+			}
 		}
 
 		/**

@@ -2,6 +2,8 @@ package edu.ncsu.uhp.escape.engine.map;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.content.Context;
+
 import edu.ncsu.uhp.escape.engine.ActionObserver;
 import edu.ncsu.uhp.escape.engine.collision.ICollidable;
 import edu.ncsu.uhp.escape.engine.utilities.IRenderable;
@@ -36,7 +38,7 @@ public abstract class Map<DataType> extends ActionObserver<Map<DataType>> {
 	 */
 	public abstract boolean doesCollide(ICollidable checkCollision);
 
-	public abstract IRenderable getRenderable(GL10 gl);
+	public abstract IRenderable getRenderable(Context context, GL10 gl);
 
 	
 }
