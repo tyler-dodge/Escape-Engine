@@ -15,10 +15,20 @@ public class AABB_NarrowPhase implements INarrowCollision {
 
 	private class ProjectedEdge {
 		public ProjectedEdge(float startX, float startY, float endX, float endY) {
-			this.startX = startX;
-			this.startY = startY;
-			this.endX = endX;
-			this.endY = endY;
+			if (startX > endX) {
+				this.startX = endX;
+				this.endX = startX;
+			} else {
+				this.startX = startX;
+				this.endX = endX;
+			}
+			if (startY > endY) {
+				this.startY = endY;
+				this.endY = startY; 
+			} else {
+				this.startY = startY;
+				this.endY = endY;
+			}
 		}
 
 		public float startX, startY;
@@ -152,8 +162,8 @@ public class AABB_NarrowPhase implements INarrowCollision {
 					offsets);
 			for (int y = 0; y < 4; y++) {
 				for (int x = 0; x < 4; x++) {
-					ProjectedEdge thisEdge=thisEdges[x];
-					ProjectedEdge checkEdge=checkEdges[y];
+					ProjectedEdge thisEdge = thisEdges[x];
+					ProjectedEdge checkEdge = checkEdges[y];
 					if (doEdgesIntersect(thisEdge, checkEdge)) {
 						return true;
 					}
