@@ -1,5 +1,8 @@
 package edu.ncsu.uhp.escape.engine.collision;
 
+import javax.microedition.khronos.opengles.GL10;
+
+import android.content.Context;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 import edu.ncsu.uhp.escape.engine.utilities.*;
 
@@ -12,6 +15,7 @@ import edu.ncsu.uhp.escape.engine.utilities.*;
 public class OB_BroadPhase implements IBroadCollision {
 	private Point dimension;
 	private Point offsets;
+	private RenderSource source;
 
 	/**
 	 * Constructs a Collision Box from the Points dimension and offsets.
@@ -22,6 +26,8 @@ public class OB_BroadPhase implements IBroadCollision {
 	public OB_BroadPhase(Point dimension, Point offsets) {
 		this.dimension = dimension;
 		this.offsets = offsets;
+		this.source = new ColorBoxSource(hashCode(), 0, 0, 255, 255, dimension,
+				offsets);
 	}
 
 	/**
@@ -75,5 +81,16 @@ public class OB_BroadPhase implements IBroadCollision {
 			}
 		}
 		return collide;
+	}
+
+	public boolean doesCollide(Point thisPosition, IRotation thisRotation,
+			ICollision checkCollide, Point checkPosition,
+			IRotation checkRotation) {
+		return doesCollideBroad(thisPosition, thisRotation, checkCollide,
+				checkPosition, checkRotation);
+	}
+
+	public IRenderable getRenderable(Context context, GL10 gl) {
+		return this.getRenderable(context, gl);
 	}
 }
