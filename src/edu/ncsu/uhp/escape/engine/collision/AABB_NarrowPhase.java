@@ -127,6 +127,11 @@ public class AABB_NarrowPhase implements INarrowCollision {
 		return edges;
 	}
 
+	private boolean doEdgesIntersect(ProjectedEdge edge1, ProjectedEdge edge2) {
+		return ((edge1.startX >= edge2.startX && edge1.startX <= edge2.endX) || (edge1.endX >= edge2.startX && edge1.endX <= edge2.endX))
+				&& ((edge1.startY >= edge2.startY && edge1.startY <= edge2.endY) || (edge1.endY >= edge2.startY && edge1.endY <= edge2.endY));
+	}
+
 	/**
 	 * Checks for collision
 	 */
@@ -147,17 +152,11 @@ public class AABB_NarrowPhase implements INarrowCollision {
 					offsets);
 			for (int y = 0; y < 4; y++) {
 				for (int x = 0; x < 4; x++) {
-					float xCheckEnd = checkEdges[x].endX - thisEdges[y].endX;
-					float xCheckStart = checkEdges[x].endX
-							- thisEdges[y].startX;
-					float yCheckEnd = checkEdges[x].endY - thisEdges[y].endY;
-					float yCheckStart = checkEdges[x].endY
-							- thisEdges[y].startY;
-					if (((xCheckEnd <= checkEdges[x].startX && xCheckEnd >= 0) || (xCheckStart <= checkEdges[x].startX && xCheckStart >= 0))
-							&& ((yCheckEnd <= checkEdges[x].startY && yCheckEnd >= 0) || (yCheckStart <= checkEdges[x].startY && yCheckStart >= 0))) {
+					ProjectedEdge thisEdge=thisEdges[x];
+					ProjectedEdge checkEdge=checkEdges[y];
+					if (doEdgesIntersect(thisEdge, checkEdge)) {
 						return true;
 					}
-
 				}
 			}
 		}
