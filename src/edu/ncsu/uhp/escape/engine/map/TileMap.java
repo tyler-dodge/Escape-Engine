@@ -24,7 +24,6 @@ public class TileMap extends Map<TileMap> {
 	private IRotation rotation;
 	private Tile[][] tiles;
 	private IRenderable renderable;
-	private Context context;
 	private Point dimensions;
 	private int width;
 	private int height;
@@ -34,7 +33,6 @@ public class TileMap extends Map<TileMap> {
 		this.tiles = tiles;
 		width = tiles.length;
 		height = tiles[0].length;
-		this.context = context;
 		this.dimensions = dimensions;
 	}
 
@@ -66,7 +64,7 @@ public class TileMap extends Map<TileMap> {
 	}
 
 	@Override
-	public IRenderable getRenderable(GL10 gl) {
+	public IRenderable getRenderable(Context context, GL10 gl) {
 		if (renderable == null) {
 			int[][] resourceIds = new int[width][height];
 			for (int y = 0; y < height; y++) {
@@ -76,7 +74,7 @@ public class TileMap extends Map<TileMap> {
 			}
 			ResourceGrid grid = new ResourceGrid(resourceIds, width, height);
 			renderable = new GridImageSource(context, 0, grid, new Point(0, 0,
-					0), dimensions, 128).getData(gl);
+					0), dimensions, 128).getData(context,gl);
 		}
 		return renderable;
 	}

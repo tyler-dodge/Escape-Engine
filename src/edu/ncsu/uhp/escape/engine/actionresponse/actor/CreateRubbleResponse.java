@@ -26,11 +26,9 @@ import edu.ncsu.uhp.escape.engine.utilities.math.Point;
  */
 public class CreateRubbleResponse<DataType extends Actor<?>> extends
 		SingleEvalActionResponseDecorator<DataType> {
-	private Context context;
 
-	public CreateRubbleResponse(Context context, IActionResponse<DataType> responder) {
+	public CreateRubbleResponse(IActionResponse<DataType> responder) {
 		super(responder);
-		this.context = context;
 	}
 
 	@Override
@@ -39,8 +37,7 @@ public class CreateRubbleResponse<DataType extends Actor<?>> extends
 			CreateRubbleAction rubbleAction = (CreateRubbleAction) action;
 			List<ICollision> skillBox = new ArrayList<ICollision>();
 				//TODO: No collisions added yet because they were crashing the program.
-			Rubble rubble = new Rubble(owner.getPosition(), rubbleAction.getData(), new ImageSource(
-					context, 0, R.drawable.ash_tree, new Point(5, 5, 0),
+			Rubble rubble = new Rubble(owner.getPosition(), rubbleAction.getData(), new ImageSource(0, R.drawable.ash_tree, new Point(5, 5, 0),
 					new Point(-2.5f, -2.5f, 3)), skillBox);
 			owner.pushAction(new CreateActorAction(owner, rubble));
 			owner.pushAction(new DieAction(owner, owner));

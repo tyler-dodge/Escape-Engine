@@ -2,6 +2,8 @@ package edu.ncsu.uhp.escape.engine.utilities;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.content.Context;
+
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 
 public class ColorBoxSource  extends RenderSource {
@@ -20,7 +22,7 @@ public class ColorBoxSource  extends RenderSource {
 	}
 
 	@Override
-	public IRenderable loadData(GL10 gl) {
+	public IRenderable loadData(Context context, GL10 gl) {
 
 		return new ColorBox(r, g, b, a, dimensions, offsets);
 	}

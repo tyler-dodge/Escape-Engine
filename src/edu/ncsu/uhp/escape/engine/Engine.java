@@ -45,12 +45,12 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	private Actor<?> followActor;
 	private Lock actorLock = new ReentrantLock();
 	private Lock observerLock = new ReentrantLock();
-	private TemporaryActorQueue actorsToBeAdded;
-	private TemporaryActorQueue actorsToBeRemoved;
-	private TemporaryObserverQueue observersToBeAdded;
-	private TemporaryObserverQueue observersToBeRemoved;
-	private Thread callingThread;
+	private TemporaryQueue<Actor<?>> actorsToBeAdded;
+	private TemporaryQueue<Actor<?>> actorsToBeRemoved;
+	private TemporaryQueue<ActionObserver<?>> observersToBeAdded;
+	private TemporaryQueue<ActionObserver<?>> observersToBeRemoved;
 	private static final boolean RENDER_COLLISIONS = true;
+	private Context context;
 
 	/**
 	 * Creates an instance of the engine
@@ -60,20 +60,12 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	 */
 	public Engine(Context context) {
 		super(ACTION_CAPACITY);
-		actorsToBeAdded = new TemporaryActorQueue();
-		actorsToBeRemoved = new TemporaryActorQueue();
-		observersToBeAdded = new TemporaryObserverQueue();
-		observersToBeRemoved = new TemporaryObserverQueue();
-		int sizeX = 20;
-		int sizeY = 20;
-		Tile[][] tiles = new Tile[sizeX][sizeY];
-		for (int x = 0; x < sizeX; x++) {
-			for (int y = 0; y < sizeY; y++) {
-				tiles[x][y] = Tile
-						.fromSourceId(context, R.drawable.grass_basic);
+		this.context = context;
+		actorsToBeAdded = new TemporaryQueue<Actor<?>>();
+		actorsToBeRemoved = new TemporaryQueue<Actor<?>>();
+		observersToBeAdded = new TemporaryQueue<ActionObserver<?>>();
+		observersToBeRemoved = new TemporaryQueue<ActionObserver<?>>();
 
-			}
-		}
 	}
 
 	public void changeMap(Map<?> map) {
@@ -111,6 +103,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	@Override
 	public void finalize() {
 		isFinalized = true;
+		context = null;
 	}
 
 	private ArrayList<Actor<?>> actors = new ArrayList<Actor<?>>();
@@ -142,11 +135,11 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	public void addActionObserver(ActionObserver<?> newObserver) {
 		observersToBeAdded.enqueue(newObserver);
 	}
-	
+
 	public void removeActionObserver(ActionObserver<?> oldObserver) {
 		observersToBeRemoved.enqueue(oldObserver);
 	}
-	
+
 	/**
 	 * Adds all the actors that are waiting to be added. Used so that the
 	 * addition of actors would be threadsafe, however this method itself is not
@@ -191,7 +184,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 			observers.add(newObserver);
 		}
 	}
-	
+
 	private void removePendingObservers() {
 		while (!observersToBeRemoved.isEmpty()) {
 			ActionObserver<?> newObserver = observersToBeRemoved.dequeue();
@@ -200,7 +193,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 			observers.remove(newObserver);
 		}
 	}
-	
+
 	/**
 	 * Evaluates all the actors' actions, engine's actions, and map's actions.
 	 * Pushes the Engine Iteration Actions onto the engine's stack. These
@@ -269,17 +262,19 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 
 		if (map != null) {
 
-			renderables.add(new RenderableData(map.getRenderable(gl),
+			renderables.add(new RenderableData(map.getRenderable(context, gl),
 					new Point(0, 0, -0.1f), ZAxisRotation.getIdentity()));
 		}
 		for (Actor<?> actor : actors) {
-			renderables.add(new RenderableData(actor.getRenderable(gl), actor
-					.getPosition(), actor.getRotation()));
+			renderables.add(new RenderableData(
+					actor.getRenderable(context, gl), actor.getPosition(),
+					actor.getRotation()));
 			if (RENDER_COLLISIONS) {
 				List<ICollision> collisions = actor.getCollisions();
 				for (ICollision coll : collisions) {
-					renderables.add(new RenderableData(coll.getRenderable(gl),
-							actor.getPosition(), actor.getRotation()));
+					renderables.add(new RenderableData(coll.getRenderable(
+							context, gl), actor.getPosition(), actor
+							.getRotation()));
 				}
 			}
 		}
@@ -346,6 +341,13 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 			isOpen = false;
 		}
 
+		public void finalize() {
+			if (tickBlocker != null) {
+				tickBlocker.cancel();
+				tickBlocker = null;
+			}
+		}
+
 		/**
 		 * Waits until tickBlocker's event fires
 		 */
@@ -372,7 +374,6 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	 */
 	public void run() {
 		FrameLimiter limiter = new FrameLimiter();
-		callingThread = Thread.currentThread();
 		while (!isFinalized && !isPaused) {
 			if (callback != null)
 				callback.tick();
@@ -381,6 +382,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 				engineSurface.requestRender();
 			limiter.blockUntilOpen();
 		}
+		limiter.finalize();
 	}
 
 	public void pause() {
@@ -402,63 +404,31 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	 * @author Tyler Dodge
 	 * 
 	 */
-	private class TemporaryActorQueue {
-		private Queue<Actor<?>> actors;
+	private class TemporaryQueue<T> {
+		private Queue<T> actors;
 		private Lock tempLock;
 
-		public TemporaryActorQueue() {
+		public TemporaryQueue() {
 			tempLock = new ReentrantLock();
-			actors = new LinkedList<Actor<?>>();
+			actors = new LinkedList<T>();
 		}
 
 		public boolean isEmpty() {
 			return actors.isEmpty();
 		}
 
-		public void enqueue(Actor<?> actor) {
+		public void enqueue(T actor) {
 			tempLock.lock();
 			actors.add(actor);
 			tempLock.unlock();
 		}
 
-		public Actor<?> dequeue() {
+		public T dequeue() {
 			tempLock.lock();
-			Actor<?> actor = actors.remove();
+			T actor = actors.remove();
 			tempLock.unlock();
 			return actor;
 		}
 	}
 
-	/**
-	 * A thread safe queue used to contain Temporary action observers.
-	 * 
-	 * @author Brandon Walkers
-	 * 
-	 */
-	private class TemporaryObserverQueue {
-		private Queue<ActionObserver<?>> observers;
-		private Lock tempLock;
-
-		public TemporaryObserverQueue() {
-			tempLock = new ReentrantLock();
-			observers = new LinkedList<ActionObserver<?>>();
-		}
-
-		public boolean isEmpty() {
-			return observers.isEmpty();
-		}
-
-		public void enqueue(ActionObserver<?> observer) {
-			tempLock.lock();
-			observers.add(observer);
-			tempLock.unlock();
-		}
-
-		public ActionObserver<?> dequeue() {
-			tempLock.lock();
-			ActionObserver<?> actor = observers.remove();
-			tempLock.unlock();
-			return actor;
-		}
-	}
 }

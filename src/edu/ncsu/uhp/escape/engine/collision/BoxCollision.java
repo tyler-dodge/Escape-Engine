@@ -2,6 +2,8 @@ package edu.ncsu.uhp.escape.engine.collision;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.content.Context;
+
 import edu.ncsu.uhp.escape.engine.utilities.ColorBoxSource;
 import edu.ncsu.uhp.escape.engine.utilities.ColorSource;
 import edu.ncsu.uhp.escape.engine.utilities.IRenderable;
@@ -28,8 +30,8 @@ public class BoxCollision extends MultiPhaseCollision {
 				dimension, offsets));
 		this.source=new ColorBoxSource(this.hashCode(), 255,0,255, 255, dimension, offsets);
 	}
-	public IRenderable getRenderable(GL10 gl)
+	public IRenderable getRenderable(Context context,GL10 gl)
 	{
-		return source.getData(gl);
+		return source.getData(context,gl);
 	}
 }

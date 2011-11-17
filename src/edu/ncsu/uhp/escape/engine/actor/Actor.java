@@ -10,6 +10,8 @@ import java.util.*;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import android.content.Context;
+
 /**
  * Base of all Actor classes. Handles management of actions, RenderSource, and
  * collisions
@@ -114,8 +116,8 @@ public abstract class Actor<DataType> extends ActionObserver<DataType>
 				this.position));
 	}
 
-	public IRenderable getRenderable(GL10 gl) {
-		return source.getData(gl);
+	public IRenderable getRenderable(Context context,GL10 gl) {
+		return source.getData(context,gl);
 	}
 
 	/**
