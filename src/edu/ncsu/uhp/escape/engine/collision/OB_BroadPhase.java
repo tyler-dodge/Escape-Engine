@@ -66,15 +66,15 @@ public class OB_BroadPhase implements IBroadCollision {
 		if (boxCheckCollision != null) {
 			Point thisCorner = this.dimension;
 			Point checkOffsets = checkPosition.subtract(thisPosition
-					.add(offsets));
+					.subtract(offsets)).add(boxCheckCollision.offsets);
 			Point checkCorner = boxCheckCollision.dimension
-					.subtract(checkOffsets.add(boxCheckCollision.offsets));
-			boolean topX = checkOffsets.getX() >= 0;
-			boolean topY = checkOffsets.getY() >= 0;
-			boolean topZ = checkOffsets.getZ() >= 0;
-			boolean cornerX = checkCorner.getX() <= thisCorner.getX();
-			boolean cornerY = checkCorner.getY() <= thisCorner.getY();
-			boolean cornerZ = checkCorner.getZ() <= thisCorner.getZ();
+					.add(checkOffsets);
+			boolean topX = checkOffsets.getX() >= 0 || checkCorner.getX() >= 0;
+			boolean topY = checkOffsets.getY() >= 0 || checkCorner.getY() >= 0;
+			boolean topZ = checkOffsets.getZ() >= 0 || checkCorner.getZ() >= 0;
+			boolean cornerX = checkCorner.getX() <= thisCorner.getX() || checkOffsets.getX() <= thisCorner.getX();
+			boolean cornerY = checkCorner.getY() <= thisCorner.getY() || checkOffsets.getY() <= thisCorner.getY();
+			boolean cornerZ = checkCorner.getZ() <= thisCorner.getZ() || checkOffsets.getZ() <= thisCorner.getZ();
 			if (((topX && cornerX) && (topY && cornerY) && (topZ && cornerZ))
 					|| ((!topX && !cornerX) && (!topY && !cornerY) && (!topZ && !cornerZ))) {
 				collide = true;
