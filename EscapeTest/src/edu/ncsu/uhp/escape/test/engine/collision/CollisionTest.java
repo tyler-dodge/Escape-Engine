@@ -37,7 +37,25 @@ public class CollisionTest extends AndroidTestCase {
 				ZAxisRotation.getIdentity(), coll2, new Point(0, 0, 0),
 				ZAxisRotation.getIdentity()));
 	}
-	
+	public void testBroadPhaseOffsets() {
+		OB_BroadPhase coll1 = new OB_BroadPhase(new Point(1, 1, 1), new Point(
+				1, 0, 0));
+		OB_BroadPhase coll2 = new OB_BroadPhase(new Point(1, 1, 1), new Point(
+				0, 0, 0));
+		assertTrue(coll1.doesCollide(new Point(0, 0, 0),
+				ZAxisRotation.getIdentity(), coll2, new Point(0.5f, 0, 0),
+				ZAxisRotation.getIdentity()));
+		assertTrue(coll1.doesCollide(new Point(0, 0, 0),
+				ZAxisRotation.getIdentity(), coll2, new Point(0, 0.5f, 0),
+				ZAxisRotation.getIdentity()));
+		assertTrue(coll1.doesCollide(new Point(-0.5f, 0, 0),
+				ZAxisRotation.getIdentity(), coll2, new Point(0, 0, 0),
+				ZAxisRotation.getIdentity()));
+		assertTrue(coll1.doesCollide(new Point(0, -0.5f, 0),
+				ZAxisRotation.getIdentity(), coll2, new Point(0, 0, 0),
+				ZAxisRotation.getIdentity()));
+		
+	}
 	public void testBroadPhaseNoCollision() {
 		OB_BroadPhase coll1 = new OB_BroadPhase(new Point(1, 1, 1), new Point(
 				0, 0, 0));
@@ -93,5 +111,46 @@ public class CollisionTest extends AndroidTestCase {
 		assertTrue(coll1.doesCollide(new Point(0, 0.5f, 0),
 				ZAxisRotation.getIdentity(), coll2, new Point(0, 0, 0),
 				ZAxisRotation.getIdentity()));
+	}
+
+	public void testSimpleCollisionWithOffsets() {
+		BoxCollision coll1 = new BoxCollision(new Point(1, 1, 1), new Point(1,
+				1, 0));
+		BoxCollision coll2 = new BoxCollision(new Point(1, 1, 1), new Point(0,
+				0, 0));
+		assertTrue(coll1.doesCollide(new Point(0, 0, 0),
+				ZAxisRotation.getIdentity(), coll2, new Point(0.5f, 0, 0),
+				ZAxisRotation.getIdentity()));
+		assertTrue(coll1.doesCollide(new Point(0, 0, 0),
+				ZAxisRotation.getIdentity(), coll2, new Point(0, 0.5f, 0),
+				ZAxisRotation.getIdentity()));
+		assertTrue(coll1.doesCollide(new Point(-0.5f, 0, 0),
+				ZAxisRotation.getIdentity(), coll2, new Point(0, 0, 0),
+				ZAxisRotation.getIdentity()));
+		assertTrue(coll1.doesCollide(new Point(0, -0.5f, 0),
+				ZAxisRotation.getIdentity(), coll2, new Point(0, 0, 0),
+				ZAxisRotation.getIdentity()));
+	}
+	public void testRotatedCollision() {
+		BoxCollision coll1 = new BoxCollision(new Point(1, 1, 1), new Point(0,
+				0, 0));
+		BoxCollision coll2 = new BoxCollision(new Point(1, 1, 1), new Point(0,
+				0, 0));
+		ZAxisRotation rotation=new ZAxisRotation((float)(Math.PI/4.0f));
+		assertTrue(coll1.doesCollide(new Point(0, 0, 0),
+				rotation, coll2, new Point(0.5f, 0, 0),
+				ZAxisRotation.getIdentity()));
+		assertTrue(coll1.doesCollide(new Point(0, 0, 0),
+				rotation, coll2, new Point(0, 0.5f, 0),
+				ZAxisRotation.getIdentity()));
+		assertTrue(coll1.doesCollide(new Point(0.5f, 0, 0),
+				ZAxisRotation.getIdentity(), coll2, new Point(0, 0, 0),
+				rotation));
+		assertTrue(coll1.doesCollide(new Point(0, 0.5f, 0),
+				ZAxisRotation.getIdentity(), coll2, new Point(0, 0, 0),
+				rotation));
+		assertTrue(coll1.doesCollide(new Point(0, 1.0f, 0),
+				ZAxisRotation.getIdentity(), coll2, new Point(0, 0, 0),
+				rotation));				
 	}
 }
