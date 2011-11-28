@@ -30,7 +30,10 @@ public class AABB_NarrowPhase implements INarrowCollision {
 				this.endY = endY;
 			}
 		}
-
+		@Override
+		public String toString() { 
+			return String.format("[Edge x: %.2f-%.2f, y: %.2f-%.2f]", startX,endX,startY,endY);
+		}
 		public float startX, startY;
 		public float endX, endY;
 	}

@@ -24,7 +24,12 @@ public class OB_BroadPhase implements IBroadCollision {
 	 * @param offsets
 	 */
 	public OB_BroadPhase(Point dimension, Point offsets) {
-		this.dimension = dimension;
+		float max=dimension.getX();
+		if (dimension.getY()>max)
+			max=dimension.getY();
+		if (dimension.getZ()>max)
+			max=dimension.getZ();
+		this.dimension = new Point(max*1.5f,max*1.5f,max*1.5f);
 		this.offsets = offsets;
 		this.source = new ColorBoxSource(hashCode(), 0, 0, 255, 255, dimension,
 				offsets);
