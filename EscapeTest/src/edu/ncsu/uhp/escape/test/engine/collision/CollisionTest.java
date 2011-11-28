@@ -37,6 +37,25 @@ public class CollisionTest extends AndroidTestCase {
 				ZAxisRotation.getIdentity(), coll2, new Point(0, 0, 0),
 				ZAxisRotation.getIdentity()));
 	}
+	
+	public void testBroadPhaseNoCollision() {
+		OB_BroadPhase coll1 = new OB_BroadPhase(new Point(1, 1, 1), new Point(
+				0, 0, 0));
+		OB_BroadPhase coll2 = new OB_BroadPhase(new Point(1, 1, 1), new Point(
+				0, 0, 0));
+		assertFalse(coll1.doesCollide(new Point(0, 0, 0),
+				ZAxisRotation.getIdentity(), coll2, new Point(3.5f, 0, 0),
+				ZAxisRotation.getIdentity()));
+		assertFalse(coll1.doesCollide(new Point(0, 0, 0),
+				ZAxisRotation.getIdentity(), coll2, new Point(-3.5f, 0, 0),
+				ZAxisRotation.getIdentity()));
+		assertFalse(coll1.doesCollide(new Point(3.5f, 0, 0),
+				ZAxisRotation.getIdentity(), coll2, new Point(0, 0, 0),
+				ZAxisRotation.getIdentity()));
+		assertFalse(coll1.doesCollide(new Point(-3.5f, 0, 0),
+				ZAxisRotation.getIdentity(), coll2, new Point(0, 0, 0),
+				ZAxisRotation.getIdentity()));
+	}
 
 	public void testNoCollision() {
 		BoxCollision coll1 = new BoxCollision(new Point(1, 1, 1), new Point(0,
