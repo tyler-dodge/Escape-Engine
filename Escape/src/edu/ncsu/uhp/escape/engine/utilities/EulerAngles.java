@@ -65,7 +65,8 @@ public class EulerAngles implements IRotation {
 	}
 
 	public IRotation negative() {
-		return new EulerAngles(-yaw, -pitch, -roll);
+		return new EulerAngles(yaw == 0 ? yaw : -yaw, pitch == 0 ? pitch
+				: -pitch, roll == 0 ? roll : -roll);
 	}
 
 	public Point apply(Point point) {
