@@ -77,7 +77,7 @@ public class AABB_NarrowPhase implements INarrowCollision {
 	public Point[] getPoints(Point position, IRotation rotation) {
 		Point[] vertices = new Point[4];
 		ZAxisRotation angle = new ZAxisRotation(rotation.toGlMatrix());
-		vertices[0] = Point.getOrigin().add(this.offsets);
+		vertices[0] = this.offsets;
 		vertices[1] = new Point(0, this.dimension.getY(), 0).add(this.offsets);
 		vertices[2] = new Point(this.dimension.getX(), this.dimension.getY(), 0)
 				.add(this.offsets);
@@ -111,31 +111,13 @@ public class AABB_NarrowPhase implements INarrowCollision {
 			points[i] = points[i].subtract(relativeOffset);
 		}
 		for (int i = 0; i < 4; i++) {
-			float startX;
-			float endX;
-			float startY;
-			float endY;
 			Point point1 = points[i];
 			Point point2;
 			if (i + 1 == 4)
 				point2 = points[0];
 			else
 				point2 = points[i + 1];
-			if (point1.getX() > point2.getX()) {
-				startX = point1.getX();
-				endX = point2.getX();
-			} else {
-				startX = point2.getX();
-				endX = point1.getX();
-			}
-			if (point1.getY() > point2.getY()) {
-				startY = point1.getY();
-				endY = point2.getY();
-			} else {
-				startY = point2.getY();
-				endY = point1.getY();
-			}
-			edges[i] = new ProjectedEdge(startX, startY, endX, endY);
+			edges[i] = new ProjectedEdge(point1.getX(), point1.getY(), point2.getX(), point2.getY());
 		}
 		return edges;
 	}
