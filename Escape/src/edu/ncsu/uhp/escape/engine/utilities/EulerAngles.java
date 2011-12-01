@@ -65,20 +65,24 @@ public class EulerAngles implements IRotation {
 	}
 
 	public IRotation negative() {
-		return new EulerAngles(yaw == 0 ? yaw : -yaw, pitch == 0 ? pitch
-				: -pitch, roll == 0 ? roll : -roll);
+		return new EulerAngles(-yaw, -pitch, -roll);
 	}
 
 	public Point apply(Point point) {
-		float newX = point.getX() * ((float) Math.cos(yaw));
-		float newY = point.getY() * ((float) Math.sin(yaw));
-		float newZ = point.getZ();
-
-		newY = newY * (float) Math.cos(pitch);
-		newZ = newZ * (float) Math.sin(pitch);
-
-		newX = newX * (float) Math.cos(roll);
-		newZ = newZ * (float) Math.sin(roll);
+		float sa = (float) Math.sin(pitch);
+		float ca = (float) Math.cos(pitch);
+		float sb = (float) Math.sin(yaw);
+		float cb = (float) Math.cos(yaw);
+		float sh = (float) Math.sin(roll);
+		float ch = (float) Math.cos(roll);
+		float x = point.getX();
+		float y = point.getY();
+		float z = point.getZ();
+		float newX = (ch * ca) * x + (-ch * sa * cb + sh * sb) * y
+				+ (ch * sa * sb + sh * cb) * z;
+		float newY = sa * x + (ca * cb) * y - (ca * sb) * z;
+		float newZ = (-sh * ca) * x + (sh * sa * cb + ch * sb) * y
+				+ (-sh * sa * sb + ch * cb) * z;
 		return new Point(newX, newY, newZ);
 	}
 }
