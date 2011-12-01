@@ -24,16 +24,19 @@ public class AABB_NarrowPhase implements INarrowCollision {
 			}
 			if (startY > endY) {
 				this.startY = endY;
-				this.endY = startY; 
+				this.endY = startY;
 			} else {
 				this.startY = startY;
 				this.endY = endY;
 			}
 		}
+
 		@Override
-		public String toString() { 
-			return String.format("[Edge x: %.2f-%.2f, y: %.2f-%.2f]", startX,endX,startY,endY);
+		public String toString() {
+			return String.format("[Edge x: %.2f-%.2f, y: %.2f-%.2f]", startX,
+					endX, startY, endY);
 		}
+
 		public float startX, startY;
 		public float endX, endY;
 	}
@@ -117,14 +120,23 @@ public class AABB_NarrowPhase implements INarrowCollision {
 				point2 = points[0];
 			else
 				point2 = points[i + 1];
-			edges[i] = new ProjectedEdge(point1.getX(), point1.getY(), point2.getX(), point2.getY());
+			edges[i] = new ProjectedEdge(point1.getX(), point1.getY(),
+					point2.getX(), point2.getY());
 		}
 		return edges;
 	}
 
-	private boolean doEdgesIntersect(ProjectedEdge edge1, ProjectedEdge edge2) {
-		return ((edge1.startX >= edge2.startX && edge1.startX <= edge2.endX) || (edge1.endX >= edge2.startX && edge1.endX <= edge2.endX))
-				&& ((edge1.startY >= edge2.startY && edge1.startY <= edge2.endY) || (edge1.endY >= edge2.startY && edge1.endY <= edge2.endY));
+	private boolean doesEdgeIntersect(ProjectedEdge edge1) {
+		boolean Xintersects = (edge1.startX >= 0 && edge1.startX <= dimension
+				.getX())
+				|| (edge1.endX >= 0 && edge1.endX <= dimension.getX())
+				|| (dimension.getX() >= edge1.startX && dimension.getX() <= edge1.endX);
+		boolean Yintersects = (edge1.startY >= 0 && edge1.startY <= dimension
+				.getY())
+				|| (edge1.endY >= 0 && edge1.endY <= dimension.getY())
+				|| (dimension.getY() >= edge1.startY && dimension.getY() <= edge1.endY);
+		return Xintersects && Yintersects;
+
 	}
 
 	/**
@@ -141,17 +153,13 @@ public class AABB_NarrowPhase implements INarrowCollision {
 			boxCheckCollision = (AABB_NarrowPhase) checkCollide;
 		}
 		if (boxCheckCollision != null) {
-			ProjectedEdge[] thisEdges = this.getOriginProjectedEdges();
 			ProjectedEdge[] checkEdges = boxCheckCollision.getProjectedEdges(
 					checkPosition, checkRotation, thisPosition, thisRotation,
 					offsets);
-			for (int y = 0; y < 4; y++) {
-				for (int x = 0; x < 4; x++) {
-					ProjectedEdge thisEdge = thisEdges[x];
-					ProjectedEdge checkEdge = checkEdges[y];
-					if (doEdgesIntersect(thisEdge, checkEdge)) {
-						return true;
-					}
+			for (int x = 0; x < 4; x++) {
+				ProjectedEdge checkEdge = checkEdges[x];
+				if (doesEdgeIntersect(checkEdge)) {
+					return true;
 				}
 			}
 		}
