@@ -20,7 +20,17 @@ public class ColorSource extends RenderSource {
 		this.dimensions = dimensions;
 		this.offsets = offsets;
 	}
-
+	
+	public ColorSource(int r, int g, int b, int a, Point dimensions,
+			Point offsets) {
+		this.r = r;
+		this.g = g;
+		this.b = b;
+		this.a = a;
+		this.dimensions = dimensions;
+		this.offsets = offsets;
+	}
+	
 	@Override
 	public IRenderable loadData(Context context,GL10 gl) {
 

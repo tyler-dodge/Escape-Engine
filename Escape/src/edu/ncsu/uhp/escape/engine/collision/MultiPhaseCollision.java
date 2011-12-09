@@ -1,9 +1,6 @@
 package edu.ncsu.uhp.escape.engine.collision;
 
-import edu.ncsu.uhp.escape.engine.utilities.ColorSource;
-import edu.ncsu.uhp.escape.engine.utilities.IRenderable;
 import edu.ncsu.uhp.escape.engine.utilities.IRotation;
-import edu.ncsu.uhp.escape.engine.utilities.RenderSource;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 
 

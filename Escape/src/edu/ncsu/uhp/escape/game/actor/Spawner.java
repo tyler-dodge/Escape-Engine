@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import android.content.Context;
 import edu.ncsu.uhp.escape.R;
 import edu.ncsu.uhp.escape.engine.ActionObserver;
 import edu.ncsu.uhp.escape.engine.actionresponse.BaseActionResponse;
@@ -74,7 +73,7 @@ public class Spawner extends ActionObserver<Spawner>{
 			List<ICollision> enemyBox = new ArrayList<ICollision>();
 			enemyBox.add(enemyCollision);
 			
-			for(int i = 0; i < 5; i++){
+			for(int i = 0; i < 1; i++){
 				Enemy<BaseEnemyBlob> enemy = new BaseEnemyBlob(points.get(0), new ZAxisRotation(0),
 						new ImageSource(0,
 								R.drawable.mage_ani_1, new Point(5, 5, 0), new Point(
@@ -88,7 +87,7 @@ public class Spawner extends ActionObserver<Spawner>{
 		}
 		
 		public boolean hasNext(){
-			return queuedEnemies.getFirst() != null;
+			return !queuedEnemies.isEmpty();
 		}
 	}
 	
