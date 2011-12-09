@@ -154,6 +154,10 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 				newActor.addObserver(actor);
 				actor.addObserver(newActor);
 			}
+			for (ActionObserver<?> observer : observers) {
+				newActor.addObserver(observer);
+				observer.addObserver(newActor);
+			}
 			actors.add(newActor);
 		}
 	}
@@ -180,6 +184,10 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 			for (ActionObserver<?> observer : observers) {
 				newObserver.addObserver(observer);
 				observer.addObserver(newObserver);
+			}
+			for (Actor<?> actor : actors) {
+				newObserver.addObserver(actor);
+				actor.addObserver(newObserver);
 			}
 			observers.add(newObserver);
 		}
@@ -372,7 +380,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	 * Runs the engine in the current thread. Since the Engine implements
 	 * Runnable, this can be used as the entry point for a thread.
 	 */
-	public void run() {
+	public void run() { 
 		FrameLimiter limiter = new FrameLimiter();
 		while (!isFinalized && !isPaused) {
 			if (callback != null)

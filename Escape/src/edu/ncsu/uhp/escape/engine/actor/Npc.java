@@ -21,7 +21,7 @@ import edu.ncsu.uhp.escape.engine.utilities.math.*;
 
 public abstract class Npc<DataType extends Actor<DataType>> extends
 		Actor<DataType> {
-	public static final float speed = 2;
+	public static final float speed = .5f;
 
 	public float speedMod = 0;
 

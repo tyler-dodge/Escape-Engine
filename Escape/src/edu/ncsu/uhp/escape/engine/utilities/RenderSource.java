@@ -17,6 +17,10 @@ public abstract class RenderSource {
 	public RenderSource(int id) {
 		this.sourceId = id;
 	}
+	
+	public RenderSource() {
+		this.sourceId = System.identityHashCode(this);
+	}
 
 	public int getSourceId() {
 		return sourceId;
