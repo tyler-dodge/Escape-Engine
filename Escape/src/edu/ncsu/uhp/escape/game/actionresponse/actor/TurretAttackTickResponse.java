@@ -26,19 +26,23 @@ public class TurretAttackTickResponse<DataType extends Turret<?>> extends Single
 	
 	public boolean evalAction(DataType owner, Action<?> action) {
 		if (action instanceof EngineTickAction && owner.isPlaced()) {
-			currentTick++;
-			if(currentTick == ticksBetweenSpawns){
-				currentTick = 0;
-				LinkedHashSet<Enemy<?>> enemies = owner.getEnemiesInRange();
-				for(Enemy<?> enemy : enemies) {
-					if(owner.isWithinRange(enemy)){
-						owner.attack(enemy);
-						return false;
-					}
-					else{
-						enemies.remove(enemy);
+			LinkedHashSet<Enemy<?>> enemies = owner.getEnemiesInRange();
+			if(!enemies.isEmpty()){
+				currentTick++;
+				if(currentTick == ticksBetweenSpawns){
+					currentTick = 0;
+					for(Enemy<?> enemy : enemies) {
+						if(owner.isWithinRange(enemy)){
+							owner.attack(enemy);
+							return false;
+						}
+						else{
+							enemies.remove(enemy);
+						}
 					}
 				}
+			} else{
+				currentTick = 0;
 			}
 		}
 		return false;
