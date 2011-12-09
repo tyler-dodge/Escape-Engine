@@ -109,7 +109,7 @@ public class Escape extends Activity {
 			float relX = event.getX() * ratioX;
 			float relY = (glSurface.getHeight() - event.getY()) * ratioY;
 
-				if(selectedTurret){
+			if(selectedTurret){
 					BoxCollision collisionBox = new BoxCollision(new Point(5, 5, 5),
 							new Point(-2.5f, -2.5f, -2.5f));
 					List<ICollision> box = new ArrayList<ICollision>();
@@ -121,20 +121,22 @@ public class Escape extends Activity {
 		        	engine.pushAction(new CreateActorAction(engine, currentTurret));
 		        	placingTurret = true;
 		        	selectedTurret = false;
-				}
+			}
 				
-				if(placingTurret){	
-					turretRelX = relX;
-					turretRelY = relY;
-				}
+			if(placingTurret){	
+				turretRelX = relX;
+				turretRelY = relY;
+			}
 			} else if (event.getAction() == MotionEvent.ACTION_UP) {
-				placingTurret = false;
-				if(!currentTurret.placeable()){
-					engine.pushAction(new DieAction(engine, currentTurret));
-				}else{
-					currentTurret.place();
+				if(currentTurret != null){
+					placingTurret = false;
+					if(!currentTurret.placeable()){
+						engine.pushAction(new DieAction(engine, currentTurret));
+					}else{
+						currentTurret.place();
+					}
+					currentTurret = null;
 				}
-				currentTurret = null;
 			}
 		/*	
 			else if (event.getAction() == MotionEvent.ACTION_POINTER_UP) {
@@ -192,13 +194,7 @@ public class Escape extends Activity {
 		distanceZ = (float) -(((heightY / Math.tan(Math.toRadians(FOV) / 2)) / 2) + DISTANCE_FROM_CLOSE_PLANE);
 		widthX = heightY * aspectRatio;
 		
-		
-		/*track = new BaseEnemyBlob(new Point(0, 0, 1), new ZAxisRotation(0f), new ImageSource(0,
-						R.drawable.track1, new Point(widthX, heightY, 0), new Point(
-								0, 0, 0)), Track.calculateCollisionFromPoints(points), null);
-		*/
-		
-		track = new Track(new Point(0,0,1), new ImageSource(0,
+		track = new Track(new Point(0,0,0), new ImageSource(0,
 				R.drawable.track1, new Point(widthX, heightY, 0), new Point(
 						0, 0, 0)), points);
 		

@@ -1,5 +1,6 @@
 package edu.ncsu.uhp.escape.engine.actor;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -27,8 +28,8 @@ public abstract class Turret<DataType extends Turret<DataType>> extends
 	
 	private TurretCollision rangeCollision;
 	private boolean selected;
-	private LinkedHashSet<ICollidable> collidingWith = new LinkedHashSet<ICollidable>();
-	private LinkedHashSet<Enemy<?>> enemiesInRange = new LinkedHashSet<Enemy<?>>();
+	private LinkedHashSet<ICollidable> collidingWith = (LinkedHashSet<ICollidable>) Collections.synchronizedSet(new LinkedHashSet<ICollidable>());
+	private LinkedHashSet<Enemy<?>> enemiesInRange = (LinkedHashSet<Enemy<?>>) Collections.synchronizedSet(new LinkedHashSet<Enemy<?>>());
 	private boolean colliding;
 	private boolean placed;
 	
