@@ -69,7 +69,7 @@ public class Spawner extends ActionObserver<Spawner>{
 			//Add five enemies for now, will make enemy constructor/strength calculator later
 			ArrayList<Point> points = TrackPointDictionary.getInstance().getLevelPointList(getLevel());
 			BoxCollision enemyCollision = new BoxCollision(new Point(5, 5, 3),
-					new Point(0f, 0f, 0f));
+					new Point(-2.5f, -2.5f, -1.5f));
 			List<ICollision> enemyBox = new ArrayList<ICollision>();
 			enemyBox.add(enemyCollision);
 			

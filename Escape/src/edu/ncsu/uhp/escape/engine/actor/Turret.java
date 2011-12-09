@@ -41,7 +41,7 @@ public abstract class Turret<DataType extends Turret<DataType>> extends
 		super(position, rotation, source, collision);
 		this.rangeCollision = new TurretCollision(rangeDimension, rangeOffset, 0, 255, 0, 50);	
 		//Used to show range for now.
-		//getCollision().add(rangeCollision);
+		getCollision().add(rangeCollision);
 	}
 	
 	@Override

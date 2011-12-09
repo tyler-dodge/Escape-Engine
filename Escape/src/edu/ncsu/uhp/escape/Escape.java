@@ -44,7 +44,7 @@ public class Escape extends Activity {
 	private EscapeSurfaceView glSurface;
 	private Thread engineLoopThread;
 	private IRotation rotation;
-	private BaseEnemyBlob track;
+	private Track track;
 	private Nexus nexus;
 	private boolean placingTurret;
 	private boolean selectedTurret;
@@ -111,7 +111,7 @@ public class Escape extends Activity {
 
 				if(selectedTurret){
 					BoxCollision collisionBox = new BoxCollision(new Point(5, 5, 5),
-							new Point(0f, 0f, 0f));
+							new Point(-2.5f, -2.5f, -2.5f));
 					List<ICollision> box = new ArrayList<ICollision>();
 					box.add(collisionBox);
 					
@@ -185,11 +185,6 @@ public class Escape extends Activity {
 		glSurface.setEngine(engine);
 		
 		ArrayList<Point> points = TrackPointDictionary.getInstance().getLevelPointList("FIRST");
-
-		/*track = new Track(new Point(0,0,1), new ImageSource(getApplicationContext(), 0,
-				R.drawable.track1, new Point(widthX, heightY, 0), new Point(
-						0, 0, 0)), points);*/
-		
 		
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -198,9 +193,15 @@ public class Escape extends Activity {
 		widthX = heightY * aspectRatio;
 		
 		
-		track = new BaseEnemyBlob(new Point(0, 0, 1), new ZAxisRotation(0f), new ImageSource(0,
+		/*track = new BaseEnemyBlob(new Point(0, 0, 1), new ZAxisRotation(0f), new ImageSource(0,
 						R.drawable.track1, new Point(widthX, heightY, 0), new Point(
 								0, 0, 0)), Track.calculateCollisionFromPoints(points), null);
+		*/
+		
+		track = new Track(new Point(0,0,1), new ImageSource(0,
+				R.drawable.track1, new Point(widthX, heightY, 0), new Point(
+						0, 0, 0)), points);
+		
 		
 		BoxCollision nexusCollision = new BoxCollision(new Point(5, 5, 5),
 				new Point(0, 0, 0));

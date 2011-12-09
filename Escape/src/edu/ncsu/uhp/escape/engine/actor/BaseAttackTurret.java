@@ -37,12 +37,12 @@ public class BaseAttackTurret extends Turret<BaseAttackTurret> {
 	@Override
 	public void attack(Enemy<?> enemy) {
 		BoxCollision collisionBox = new BoxCollision(new Point(5, 5, 5),
-				new Point(0f, 0f, 0f));
+				new Point(-2.5f, -2.5f, -2.5f));
 		List<ICollision> box = new ArrayList<ICollision>();
 		box.add(collisionBox);
 		
 		float relX = getPosition().getX() - enemy.getPosition().getX();
-		float relY = getPosition().getY() - enemy.getPosition().getY();
+		float relY = enemy.getPosition().getY() - getPosition().getY(); 
 		float angle = (float) Math.atan(relY / relX) + 3.14f;
 		if (relX == 0 && relY == 0) {
 			angle = 0;

@@ -59,7 +59,7 @@ public class Track extends Npc<Track> {
 				origin = (trackPoints.get(i).getY() < trackPoints.get(i + 1).getY())? trackPoints.get(i) : trackPoints.get(i + 1); 
 			}
 			dimension = dimension.add(new Point(5, 5, 5));
-			origin = origin.add(new Point(-2.5f, -2.5f ,0));
+			origin = origin.add(new Point(-2.5f, -2.5f ,-2.5f));
 			
 			boxCollision = new BoxCollision(dimension, origin);
 			collision.add(boxCollision);
