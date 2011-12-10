@@ -9,7 +9,7 @@ import edu.ncsu.uhp.escape.engine.utilities.*;
 /**
  * Collision Detection
  * 
- * @author Tim Mervine
+ * @author Tyler Dodge
  * 
  */
 public class OB_BroadPhase implements IBroadCollision {
