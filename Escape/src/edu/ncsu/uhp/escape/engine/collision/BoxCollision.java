@@ -13,7 +13,7 @@ import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 /**
  * Collision Detection
  * 
- * @author Tim Mervine
+ * @author Tyler Dodge
  * 
  */
 public class BoxCollision extends MultiPhaseCollision {

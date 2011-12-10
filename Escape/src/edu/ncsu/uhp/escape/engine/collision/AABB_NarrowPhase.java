@@ -6,7 +6,7 @@ import edu.ncsu.uhp.escape.engine.utilities.*;
 /**
  * Collision Detection
  * 
- * @author Tim Mervine
+ * @author Tyler Dodge
  * 
  */
 public class AABB_NarrowPhase implements INarrowCollision {
@@ -79,14 +79,13 @@ public class AABB_NarrowPhase implements INarrowCollision {
 	 */
 	public Point[] getPoints(Point position, IRotation rotation) {
 		Point[] vertices = new Point[4];
-		ZAxisRotation angle = new ZAxisRotation(rotation.toGlMatrix());
 		vertices[0] = this.offsets;
 		vertices[1] = new Point(0, this.dimension.getY(), 0).add(this.offsets);
 		vertices[2] = new Point(this.dimension.getX(), this.dimension.getY(), 0)
 				.add(this.offsets);
 		vertices[3] = new Point(this.dimension.getX(), 0, 0).add(this.offsets);
 		for (int i = 0; i < vertices.length; i++) {
-			angle.apply(vertices[i]);
+			rotation.apply(vertices[i]);
 			vertices[i] = vertices[i].add(position);
 		}
 		return vertices;
