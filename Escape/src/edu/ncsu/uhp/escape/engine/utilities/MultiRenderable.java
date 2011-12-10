@@ -37,7 +37,7 @@ public class MultiRenderable implements IRenderable {
 		gl.glPushMatrix();
 		gl.glTranslatef(offsetX, offsetY, offsetZ);
 		for (IRenderable renderable : renderables) {
-			renderable.drawGL10(gl);
+			renderable.drawGL11(gl);
 		}
 		gl.glPopMatrix();
 	}
