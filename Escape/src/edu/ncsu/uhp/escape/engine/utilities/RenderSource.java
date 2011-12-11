@@ -17,7 +17,7 @@ public abstract class RenderSource {
 	public RenderSource(int id) {
 		this.sourceId = id;
 	}
-	
+
 	public RenderSource() {
 		this.sourceId = System.identityHashCode(this);
 	}
@@ -30,6 +30,10 @@ public abstract class RenderSource {
 		if (sourceData == null)
 			sourceData = loadData(context, gl);
 		return sourceData;
+	}
+
+	public void reload() {
+		sourceData = null;
 	}
 
 	public abstract IRenderable loadData(Context context, GL10 gl);
