@@ -2,7 +2,9 @@ package edu.ncsu.uhp.escape.engine.actor;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import edu.ncsu.uhp.escape.engine.actionresponse.BaseActionResponse;
 import edu.ncsu.uhp.escape.engine.actionresponse.IActionResponse;
@@ -13,6 +15,7 @@ import edu.ncsu.uhp.escape.engine.utilities.IRotation;
 import edu.ncsu.uhp.escape.engine.utilities.RenderSource;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 import edu.ncsu.uhp.escape.game.actionresponse.actor.CheckWithinTurretRangeResponse;
+import edu.ncsu.uhp.escape.game.actionresponse.actor.EnemyDeathTurretResponse;
 import edu.ncsu.uhp.escape.game.actionresponse.actor.TurretAttackTickResponse;
 import edu.ncsu.uhp.escape.game.actionresponse.actor.TurretCollisionResponse;
 import edu.ncsu.uhp.escape.game.utilities.TurretCollision;
@@ -28,8 +31,8 @@ public abstract class Turret<DataType extends Turret<DataType>> extends
 	
 	private TurretCollision rangeCollision;
 	private boolean selected;
-	private LinkedHashSet<ICollidable> collidingWith = (LinkedHashSet<ICollidable>) Collections.synchronizedSet(new LinkedHashSet<ICollidable>());
-	private LinkedHashSet<Enemy<?>> enemiesInRange = (LinkedHashSet<Enemy<?>>) Collections.synchronizedSet(new LinkedHashSet<Enemy<?>>());
+	private Set<ICollidable> collidingWith = Collections.synchronizedSet(new LinkedHashSet<ICollidable>());
+	private Set<Enemy<?>> enemiesInRange = Collections.synchronizedSet(new LinkedHashSet<Enemy<?>>());
 	private boolean colliding;
 	private boolean placed;
 	
@@ -42,7 +45,7 @@ public abstract class Turret<DataType extends Turret<DataType>> extends
 		super(position, rotation, source, collision);
 		this.rangeCollision = new TurretCollision(rangeDimension, rangeOffset, 0, 255, 0, 50);	
 		//Used to show range for now.
-		getCollision().add(rangeCollision);
+		//getCollision().add(rangeCollision);
 	}
 	
 	@Override
@@ -52,6 +55,7 @@ public abstract class Turret<DataType extends Turret<DataType>> extends
 		responder = new TurretCollisionResponse<DataType>(responder);
 		responder = new CheckWithinTurretRangeResponse<DataType>(responder);
 		responder = new TurretAttackTickResponse<DataType>(responder);
+		responder = new EnemyDeathTurretResponse<DataType>(responder);
 		return responder;
 	}
 	
@@ -113,10 +117,16 @@ public abstract class Turret<DataType extends Turret<DataType>> extends
 			colliding = false;
 		}
 		else{
-			for(ICollidable observer : collidingWith){
-				if(colliding == false && this.doesCollide(observer)){
+			LinkedList<ICollidable> observersToRemove = new LinkedList<ICollidable>();
+			synchronized(collidingWith){
+				for(ICollidable observer : collidingWith){
+					if(colliding == false && this.doesCollide(observer)){
+						observersToRemove.add(observer);
+						colliding = true;
+					}
+				}
+				for(ICollidable observer : observersToRemove){
 					collidingWith.remove(observer);
-					colliding = true;
 				}
 			}
 			if(colliding == false){
@@ -132,7 +142,7 @@ public abstract class Turret<DataType extends Turret<DataType>> extends
 		return collidingWith.isEmpty();
 	}
 	
-	public LinkedHashSet<Enemy<?>> getEnemiesInRange() {
+	public Set<Enemy<?>> getEnemiesInRange() {
 		return enemiesInRange;
 	}
 	

@@ -6,13 +6,15 @@ import edu.ncsu.uhp.escape.engine.actor.Actor;
 import edu.ncsu.uhp.escape.engine.actor.actions.Action;
 import edu.ncsu.uhp.escape.engine.actor.actions.ProjectileHitAction;
 import edu.ncsu.uhp.escape.engine.actor.actions.PushAction;
-import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 
 public class ProjectileResponse<DataType extends Actor<?>> extends
 		SingleEvalActionResponseDecorator<DataType> {
+	
+	private int damage;
 
-	public ProjectileResponse(IActionResponse<DataType> responder) {
+	public ProjectileResponse(IActionResponse<DataType> responder, int damage) {
 		super(responder);
+		this.damage = damage;
 	}
 
 	@Override
@@ -20,7 +22,7 @@ public class ProjectileResponse<DataType extends Actor<?>> extends
 		if (action instanceof PushAction && action.getTarget().equals(owner)) {
 			action.getSource().pushAction(
 					new ProjectileHitAction(owner, action.getSource(),
-							new Point(0, 0, 0)));
+							damage));
 		}
 		return false;
 	}

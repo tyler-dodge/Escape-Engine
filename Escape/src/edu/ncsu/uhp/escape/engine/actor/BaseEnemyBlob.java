@@ -10,15 +10,22 @@ import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 
 public class BaseEnemyBlob extends Enemy<BaseEnemyBlob>{
 
+	private int worth = 100;
+	
 	public BaseEnemyBlob(Point position, IRotation rotation,
 			RenderSource source, List<ICollision> collision,
-			NodalTrack trackPoints) {
-		super(position, rotation, source, collision, trackPoints);
+			NodalTrack trackPoints, int health) {
+		super(position, rotation, source, collision, trackPoints, health);
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public BaseEnemyBlob asDataType() {
 		return this;
+	}
+
+	@Override
+	public int getWorth() {
+		return this.worth;
 	}
 }

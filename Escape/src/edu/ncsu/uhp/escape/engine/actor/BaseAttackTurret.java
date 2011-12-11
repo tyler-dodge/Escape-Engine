@@ -36,8 +36,8 @@ public class BaseAttackTurret extends Turret<BaseAttackTurret> {
 
 	@Override
 	public void attack(Enemy<?> enemy) {
-		BoxCollision collisionBox = new BoxCollision(new Point(5, 5, 5),
-				new Point(-2.5f, -2.5f, -2.5f));
+		BoxCollision collisionBox = new BoxCollision(new Point(2, 2, 2),
+				new Point(-1f, -1f, -1f));
 		List<ICollision> box = new ArrayList<ICollision>();
 		box.add(collisionBox);
 		

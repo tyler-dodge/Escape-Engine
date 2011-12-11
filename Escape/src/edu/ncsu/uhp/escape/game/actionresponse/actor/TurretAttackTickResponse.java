@@ -1,6 +1,6 @@
 package edu.ncsu.uhp.escape.game.actionresponse.actor;
 
-import java.util.LinkedHashSet;
+import java.util.Set;
 
 import edu.ncsu.uhp.escape.engine.actionresponse.IActionResponse;
 import edu.ncsu.uhp.escape.engine.actionresponse.SingleEvalActionResponseDecorator;
@@ -26,7 +26,7 @@ public class TurretAttackTickResponse<DataType extends Turret<?>> extends Single
 	
 	public boolean evalAction(DataType owner, Action<?> action) {
 		if (action instanceof EngineTickAction && owner.isPlaced()) {
-			LinkedHashSet<Enemy<?>> enemies = owner.getEnemiesInRange();
+			Set<Enemy<?>> enemies = owner.getEnemiesInRange();
 			if(!enemies.isEmpty()){
 				currentTick++;
 				if(currentTick == ticksBetweenSpawns){

@@ -3,25 +3,10 @@ package edu.ncsu.uhp.escape;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ncsu.uhp.escape.engine.Engine;
-import edu.ncsu.uhp.escape.engine.EngineTickCallback;
-import edu.ncsu.uhp.escape.engine.actor.BaseAttackTurret;
-import edu.ncsu.uhp.escape.engine.actor.BaseEnemyBlob;
-import edu.ncsu.uhp.escape.engine.actor.Enemy;
-import edu.ncsu.uhp.escape.engine.actor.Nexus;
-import edu.ncsu.uhp.escape.engine.actor.Track;
-import edu.ncsu.uhp.escape.engine.actor.Turret;
-import edu.ncsu.uhp.escape.engine.actor.actions.CreateActorAction;
-import edu.ncsu.uhp.escape.engine.actor.actions.CreateObserverAction;
-import edu.ncsu.uhp.escape.engine.actor.actions.DieAction;
-import edu.ncsu.uhp.escape.engine.actor.actions.MoveAction;
-import edu.ncsu.uhp.escape.engine.actor.actions.PostMoveAction;
-import edu.ncsu.uhp.escape.engine.collision.BoxCollision;
-import edu.ncsu.uhp.escape.engine.collision.ICollision;
-import edu.ncsu.uhp.escape.engine.utilities.*;
-import edu.ncsu.uhp.escape.engine.utilities.math.Point;
-import edu.ncsu.uhp.escape.game.actor.Spawner;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Menu;
@@ -30,6 +15,24 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
+import edu.ncsu.uhp.escape.engine.Engine;
+import edu.ncsu.uhp.escape.engine.EngineTickCallback;
+import edu.ncsu.uhp.escape.engine.actor.BaseAttackTurret;
+import edu.ncsu.uhp.escape.engine.actor.Nexus;
+import edu.ncsu.uhp.escape.engine.actor.Track;
+import edu.ncsu.uhp.escape.engine.actor.Turret;
+import edu.ncsu.uhp.escape.engine.actor.actions.CreateActorAction;
+import edu.ncsu.uhp.escape.engine.actor.actions.CreateObserverAction;
+import edu.ncsu.uhp.escape.engine.actor.actions.DieAction;
+import edu.ncsu.uhp.escape.engine.actor.actions.PostMoveAction;
+import edu.ncsu.uhp.escape.engine.collision.BoxCollision;
+import edu.ncsu.uhp.escape.engine.collision.ICollision;
+import edu.ncsu.uhp.escape.engine.utilities.ImageSource;
+import edu.ncsu.uhp.escape.engine.utilities.TrackPointDictionary;
+import edu.ncsu.uhp.escape.engine.utilities.ZAxisRotation;
+import edu.ncsu.uhp.escape.engine.utilities.math.Point;
+import edu.ncsu.uhp.escape.game.actor.GameController;
+import edu.ncsu.uhp.escape.game.actor.Spawner;
 
 /**
  * This is the actual game in terms of setting up the map and actors. GUI events
@@ -39,18 +42,9 @@ import android.view.WindowManager;
  * 
  */
 public class Escape extends Activity {
-	private Engine engine;
-	private Enemy<BaseEnemyBlob> white;
-	private EscapeSurfaceView glSurface;
-	private Thread engineLoopThread;
-	private IRotation rotation;
-	private Track track;
-	private Nexus nexus;
-	private boolean placingTurret;
-	private boolean selectedTurret;
-	private Turret<?> currentTurret;
-	float turretRelX;
-	float turretRelY;
+	/**
+	 * Screen Properties
+	 */
 	private float ratioX;
 	private float ratioY;
 	public static final float FOV = 45f;
@@ -59,9 +53,38 @@ public class Escape extends Activity {
 	private static final float heightY = 82.75987f;
 	private static float aspectRatio;
 	public static final float DISTANCE_FROM_CLOSE_PLANE = 0.1f;
-	public Spawner spawner;
-	private boolean isPaused;
+	
+	/**
+	 * Game engine variables
+	 */
+	private Engine engine;
+	private EscapeSurfaceView glSurface;
+	private Thread engineLoopThread;	
+	
+	/**
+	 * Coordinates for ontouch events
+	 */
+	float turretRelX;
+	float turretRelY;
 
+	/**
+	 * Gui states and variables
+	 */
+	private boolean isPaused;
+	private boolean placingTurret;
+	private boolean placedTurret;
+	private boolean selectedTurret;
+	private Turret<?> currentTurret;
+	
+	/**
+	 * Popup Dialogue constants
+	 */
+	static final int DIALOG_NEXT_WAVE_ID = 0;
+	static final int DIALOG_GAMEOVER_ID = 1;
+	
+	//Game controller
+	private GameController game;
+	
 	@Override
 	public void onStop() {
 		super.onStop();
@@ -110,13 +133,13 @@ public class Escape extends Activity {
 			float relY = (glSurface.getHeight() - event.getY()) * ratioY;
 
 			if(selectedTurret){
-					BoxCollision collisionBox = new BoxCollision(new Point(5, 5, 5),
+					BoxCollision collisionBox = new BoxCollision(new Point(5, 5f, 5),
 							new Point(-2.5f, -2.5f, -2.5f));
 					List<ICollision> box = new ArrayList<ICollision>();
 					box.add(collisionBox);
 					
-		        	currentTurret = new BaseAttackTurret(new Point(relX, relY, 0), new ZAxisRotation(0f),
-		    				new ImageSource( 0, R.drawable.basic_tree, new Point(5, 5, 0), new Point(
+		        	currentTurret = new BaseAttackTurret(new Point(relX, relY, 0), new ZAxisRotation(1.57f),
+		    				new ImageSource( 0, R.drawable.turret, new Point(5, 5f, 0), new Point(
 		    								-2.5f, -2.5f, 1)), box);
 		        	engine.pushAction(new CreateActorAction(engine, currentTurret));
 		        	placingTurret = true;
@@ -129,48 +152,9 @@ public class Escape extends Activity {
 			}
 			} else if (event.getAction() == MotionEvent.ACTION_UP) {
 				if(currentTurret != null){
-					placingTurret = false;
-					if(!currentTurret.placeable()){
-						engine.pushAction(new DieAction(engine, currentTurret));
-					}else{
-						currentTurret.place();
-					}
-					currentTurret = null;
+					placedTurret = true;
 				}
 			}
-		/*	
-			else if (event.getAction() == MotionEvent.ACTION_POINTER_UP) {
-			float midX = (event.getX(0) + event.getX(1)) / 2;
-			float midY = (event.getY(0) + event.getY(1)) / 2;
-			if (centerX == -1)
-				centerX = (glSurface.getLeft() + glSurface.getWidth()) / 2;
-			if (centerY == -1)
-				centerY = (glSurface.getTop() + glSurface.getHeight()) / 2;
-			float relX = centerX - midX;
-			float relY = centerY - midY;
-			float angle = (float) Math.atan(relY / relX) + 3.14f;
-			if (relX == 0 && relY == 0) {
-				angle = 0;
-			} else if (relY == 0) {
-				if (relX > 0) {
-					angle = 0;
-				} else {
-					angle = 3.14f;
-				}
-			} else if (relX == 0) {
-				if (relY > 0) {
-					angle = 1.57f;
-				} else
-					angle = 4.71f;
-			}
-			if (relX < 0) {
-				angle += 3.14;
-			}
-			spawnRotation = new ZAxisRotation(angle);
-			white.pushAction(new FireballCastAction(white, "Fireball",
-					spawnRotation));
-		}*/
-
 		return false;
 	}
 
@@ -194,26 +178,28 @@ public class Escape extends Activity {
 		distanceZ = (float) -(((heightY / Math.tan(Math.toRadians(FOV) / 2)) / 2) + DISTANCE_FROM_CLOSE_PLANE);
 		widthX = heightY * aspectRatio;
 		
-		track = new Track(new Point(0,0,0), new ImageSource(0,
+		Track track = new Track(new Point(0,0,0), new ImageSource(0,
 				R.drawable.track1, new Point(widthX, heightY, 0), new Point(
 						0, 0, 0)), points);
 		
 		
 		BoxCollision nexusCollision = new BoxCollision(new Point(5, 5, 5),
-				new Point(0, 0, 0));
+				new Point(-2.5f, -2.5f, -2.5f));
 		List<ICollision> nexusBox = new ArrayList<ICollision>();
 		nexusBox.add(nexusCollision);
 		
-		nexus = new Nexus(new Point(widthX/2 - 2, 0, 0), new ZAxisRotation(.5f), new ImageSource(0,
+		Nexus nexus = new Nexus(new Point(widthX/2 - 2, 0, 0), new ZAxisRotation(0f), new ImageSource(0,
 						R.drawable.nexusdemo, new Point(10, 5, 0), new Point(
 								-5, -2.5f, 0)), nexusBox);
 		
-		spawner = new Spawner(1, "FIRST");
+		Spawner spawner = new Spawner(1, "FIRST");
+		
+		game = new GameController(nexus, track, spawner);
 		engine.pushAction(new CreateObserverAction(engine, spawner));
-
 		engine.pushAction(new CreateActorAction(engine, track));
 		engine.pushAction(new CreateActorAction(engine, nexus));
-
+		engine.pushAction(new CreateObserverAction(engine, game));
+		
 		engineLoopThread = new Thread(engine);
 		engineLoopThread.start();
 		engine.setGlSurface(glSurface);
@@ -232,6 +218,17 @@ public class Escape extends Activity {
 				currentTurret.testStillColliding();
 				currentTurret.setPosition(new Point(turretRelX, turretRelY, 1));
 			}
+			if(placedTurret){
+				placingTurret = false;
+				if(!currentTurret.placeable()){
+					engine.pushAction(new DieAction(engine, currentTurret));
+				}else{
+					currentTurret.place();
+				}
+				currentTurret = null;
+				placedTurret = false;
+			}
+			//if(spawner.getEnemyDictionary())
 		}
 	}
 
@@ -254,6 +251,47 @@ public class Escape extends Activity {
              return super.onOptionsItemSelected(item);
      }
 		
+	protected Dialog onCreateDialog(int id) {
+		Dialog dialog;
+		switch(id) {
+		case DIALOG_NEXT_WAVE_ID:
+			AlertDialog.Builder waveBuilder = new AlertDialog.Builder(this);
+			waveBuilder.setMessage("You beat the wave! Do you want to continue?")
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						//spawner.nextWave();
+						dialog.cancel();
+					}
+				})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						Escape.this.finish();
+					}
+				});
+			dialog = waveBuilder.create();
+			break;
+		case DIALOG_GAMEOVER_ID:
+			AlertDialog.Builder gameOverBuilder = new AlertDialog.Builder(this);
+			gameOverBuilder.setMessage("Game Over! Do you want to start over?")
+				.setCancelable(false)
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						//restart game
+					}
+				})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						Escape.this.finish();
+					}
+				});
+			dialog = gameOverBuilder.create();
+			break;
+		default:
+			dialog = null;
+		}
+		return dialog;
+	}
+	 
 		public static float getWidthX() {
 			return widthX;
 		}
