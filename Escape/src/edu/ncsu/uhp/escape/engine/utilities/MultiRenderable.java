@@ -19,6 +19,7 @@ public class MultiRenderable implements IRenderable {
 	public MultiRenderable(IRenderable[] renderables, Point offsets) {
 		if (offsets == null)
 			throw new IllegalArgumentException("Offsets cannot be null");
+		this.renderables = renderables;
 		setOffsets(offsets);
 	}
 
