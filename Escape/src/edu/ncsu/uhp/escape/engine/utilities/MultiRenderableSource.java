@@ -10,9 +10,10 @@ public class MultiRenderableSource extends RenderSource {
 	private Point offsets;
 	private RenderSource[] sources;
 
-	public MultiRenderableSource(int id, RenderSource[] sources) {
+	public MultiRenderableSource(int id, RenderSource[] sources, Point offsets) {
 		super(id);
 		this.sources = sources;
+		this.offsets = offsets;
 	}
 
 	@Override
