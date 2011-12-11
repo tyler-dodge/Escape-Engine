@@ -25,7 +25,7 @@ public class Fireball extends Npc<Fireball> {
 	public Fireball(Point position, IRotation rotation, RenderSource source,
 			List<ICollision> collision) {
 		super(position, rotation, source, collision);
-		this.speedMod = 1;
+		this.speedMod = (float) 1.25;
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class Fireball extends Npc<Fireball> {
 		IActionResponse<Fireball> superResponse = new MovementResponse<Fireball>(responder);
 		superResponse = new DieAfterTicksResponse<Fireball>(superResponse, 60);
 		superResponse = new DieAfterCollisionResponse<Fireball>(superResponse);
-		superResponse = new ProjectileResponse<Fireball>(superResponse);
+		superResponse = new ProjectileResponse<Fireball>(superResponse, 1);
 		return new MoveOnTickResponse<Fireball>(superResponse);
 	}
 

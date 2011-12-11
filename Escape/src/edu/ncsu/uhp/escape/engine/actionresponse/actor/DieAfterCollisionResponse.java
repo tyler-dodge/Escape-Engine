@@ -2,10 +2,12 @@ package edu.ncsu.uhp.escape.engine.actionresponse.actor;
 
 import edu.ncsu.uhp.escape.engine.actionresponse.ActionResponseDecorator;
 import edu.ncsu.uhp.escape.engine.actionresponse.IActionResponse;
+import edu.ncsu.uhp.escape.engine.actionresponse.SingleEvalActionResponseDecorator;
 import edu.ncsu.uhp.escape.engine.actor.Actor;
 import edu.ncsu.uhp.escape.engine.actor.Enemy;
 import edu.ncsu.uhp.escape.engine.actor.actions.Action;
 import edu.ncsu.uhp.escape.engine.actor.actions.DieAction;
+import edu.ncsu.uhp.escape.engine.actor.actions.ProjectileHitAction;
 import edu.ncsu.uhp.escape.engine.actor.actions.PushAction;
 
 /**
@@ -14,7 +16,7 @@ import edu.ncsu.uhp.escape.engine.actor.actions.PushAction;
  * @author Brandon Walker
  *
  */
-public class DieAfterCollisionResponse<DataType extends Actor<?>> extends ActionResponseDecorator<DataType> {
+public class DieAfterCollisionResponse<DataType extends Actor<?>> extends SingleEvalActionResponseDecorator<DataType> {
 	
 	public DieAfterCollisionResponse(IActionResponse<DataType> responder) {
 		super(responder);
