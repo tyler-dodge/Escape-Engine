@@ -8,7 +8,7 @@ import edu.ncsu.uhp.escape.engine.actor.actions.CreateActorAction;
 import edu.ncsu.uhp.escape.engine.actor.actions.EngineTickAction;
 import edu.ncsu.uhp.escape.game.actor.GameController;
 
-public class SpawnerTickResponse  extends SingleEvalActionResponseDecorator<GameController>{
+public class SpawnerTickResponse extends SingleEvalActionResponseDecorator<GameController>{
 
 	private static final int DEFAULT_TICKS = 20;
 	private int ticksBetweenSpawns;

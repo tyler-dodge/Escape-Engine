@@ -3,6 +3,7 @@ package edu.ncsu.uhp.escape.engine.actor;
 import edu.ncsu.uhp.escape.engine.ActionObserver;
 import edu.ncsu.uhp.escape.engine.actionresponse.BaseActionResponse;
 import edu.ncsu.uhp.escape.engine.actionresponse.IActionResponse;
+import edu.ncsu.uhp.escape.engine.actionresponse.actor.MovementResponse;
 import edu.ncsu.uhp.escape.engine.collision.BoxCollision;
 import edu.ncsu.uhp.escape.engine.collision.ICollidable;
 import edu.ncsu.uhp.escape.engine.collision.ICollision;
@@ -79,7 +80,9 @@ public class Track extends Npc<Track> {
 
 	@Override
 	public IActionResponse<Track> createDefaultResponse() {
-		return new BaseActionResponse<Track>();
+		IActionResponse<Track> responder =  new BaseActionResponse<Track>();
+		responder = new MovementResponse<Track>(responder);
+		return responder;
 	}
 
 	@Override

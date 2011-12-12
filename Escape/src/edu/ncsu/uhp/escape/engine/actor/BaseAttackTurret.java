@@ -12,6 +12,7 @@ import edu.ncsu.uhp.escape.engine.utilities.ImageSource;
 import edu.ncsu.uhp.escape.engine.utilities.RenderSource;
 import edu.ncsu.uhp.escape.engine.utilities.ZAxisRotation;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
+import edu.ncsu.uhp.escape.game.utilities.TurretCollision;
 
 /**
  * Base Attack Turret that extends Turret
@@ -21,12 +22,14 @@ import edu.ncsu.uhp.escape.engine.utilities.math.Point;
  */
 public class BaseAttackTurret extends Turret<BaseAttackTurret> {
 	
-	static Point rangeDimension = new Point(20, 20, 1);
-	static Point rangeOffset = new Point(-10, -10, 0);
+	public static Point RANGE_DIMENSION = new Point(20, 20, 1);
+	public static Point RANGE_OFFSET = new Point(-10, -10, 0);
+	
+	public static final TurretCollision DEFAULT_TURRET_RANGE = new TurretCollision(RANGE_DIMENSION, RANGE_OFFSET, 0, 255, 0, 50);
 
 	public BaseAttackTurret(Point position, IRotation rotation,
 			RenderSource source, List<ICollision> collision) {
-		super(position, rotation, source, collision, rangeDimension, rangeOffset);
+		super(position, rotation, source, collision, DEFAULT_TURRET_RANGE);
 	}
 
 	@Override

@@ -24,7 +24,7 @@ public class GameController extends ActionObserver<GameController>{
 	private Track track;
 
 	private int health = 100;
-	private int money;
+	private int money = 500;
 
 	private ArrayList<Enemy<?>> activeEnemies = new ArrayList<Enemy<?>>();
 	
@@ -37,6 +37,21 @@ public class GameController extends ActionObserver<GameController>{
 
 	public GameController(Nexus nexus, Track track, Spawner spawner){
 		this(ACTION_CAPACITY, nexus, track, spawner);
+	}
+	
+	public boolean getWaveOver(){
+		return activeEnemies.isEmpty() && spawner.getEnemyDictionary().queuedEnemies.isEmpty();
+	}
+	
+	public boolean getGameOver(){
+		return health <= 0;
+	}
+	
+	public void resetGame(){
+		spawner.setWave(0);
+		spawner.nextWave();
+		health = 100;
+		money = 500;
 	}
 	
 	@Override
@@ -58,6 +73,14 @@ public class GameController extends ActionObserver<GameController>{
 
 	public void setHealth(int health) {
 		this.health = health;
+	}
+	
+	public void damageHealth(int health){
+		this.health = this.health - health;
+	}
+	
+	public void addHealth(int health){
+		this.health = this.health + health;
 	}
 
 	public int getMoney() {

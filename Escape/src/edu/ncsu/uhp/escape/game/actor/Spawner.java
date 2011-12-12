@@ -70,14 +70,16 @@ public class Spawner extends ActionObserver<Spawner>{
 					new Point(-2.5f, -2.5f, -1.5f));
 			List<ICollision> enemyBox = new ArrayList<ICollision>();
 			enemyBox.add(enemyCollision);
+			int number = 1;
 			for(int i = wave; i > 0; i--){
-				for(int n = 0; n < (wave - i + 1); n++){
+				for(int n = number; n > 0; n--){
 					Enemy<BaseEnemyBlob> enemy = new BaseEnemyBlob(points.get(0), new ZAxisRotation(0),
 							new ImageSource(0,
 									R.drawable.mage_ani_1, new Point(5, 5, 0), new Point(
 											-2.5f, -2.5f, 0)), enemyBox, NodalTrack.getInstanceForTrackLevel(getLevel()), i);
 					queuedEnemies.addFirst(enemy);
 				}
+				number *= i;
 			}
 		}
 		

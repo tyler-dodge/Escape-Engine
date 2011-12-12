@@ -8,6 +8,9 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -81,9 +84,24 @@ public class Escape extends Activity {
 	 */
 	static final int DIALOG_NEXT_WAVE_ID = 0;
 	static final int DIALOG_GAMEOVER_ID = 1;
+	static final String NEXT_WAVE = "NEXT WAVE";
+	static final String GAME_OVER = "GAME OVER";
 	
 	//Game controller
 	private GameController game;
+	
+	//GUI Handler
+	private Handler handler = new Handler(){
+		@Override
+		public void handleMessage(Message msg) {
+			String event = (msg.obj == null)? "" : msg.obj.toString();
+			if(event.equals(NEXT_WAVE)){
+				showDialog(DIALOG_NEXT_WAVE_ID);
+			}else if(event.equals(GAME_OVER)){
+				showDialog(DIALOG_GAMEOVER_ID);
+			}
+		}
+	};
 	
 	@Override
 	public void onStop() {
@@ -111,6 +129,7 @@ public class Escape extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 		engine.finalize();
+		Looper.getMainLooper().quit();
 		try {
 			this.finalize();
 		} catch (Throwable e) {
@@ -138,10 +157,10 @@ public class Escape extends Activity {
 					List<ICollision> box = new ArrayList<ICollision>();
 					box.add(collisionBox);
 					
-		        	currentTurret = new BaseAttackTurret(new Point(relX, relY, 0), new ZAxisRotation(1.57f),
-		    				new ImageSource( 0, R.drawable.turret, new Point(5, 5f, 0), new Point(
-		    								-2.5f, -2.5f, 1)), box);
-		        	engine.pushAction(new CreateActorAction(engine, currentTurret));
+					currentTurret = new BaseAttackTurret(new Point(relX, relY, 0), new ZAxisRotation(1.57f),
+		    				new ImageSource(0, R.drawable.turret, new Point(5, 5f, 0), new Point(-2.5f, -2.5f, 1)), box);
+
+					engine.pushAction(new CreateActorAction(engine, currentTurret));
 		        	placingTurret = true;
 		        	selectedTurret = false;
 			}
@@ -152,7 +171,7 @@ public class Escape extends Activity {
 			}
 			} else if (event.getAction() == MotionEvent.ACTION_UP) {
 				if(currentTurret != null){
-					placedTurret = true;
+				placedTurret = true;
 				}
 			}
 		return false;
@@ -166,11 +185,10 @@ public class Escape extends Activity {
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.main);
+				
 		engine = new Engine(getApplicationContext());
 		glSurface = (EscapeSurfaceView) findViewById(R.id.engineSurface);
 		glSurface.setEngine(engine);
-		
-		ArrayList<Point> points = TrackPointDictionary.getInstance().getLevelPointList("FIRST");
 		
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -178,10 +196,13 @@ public class Escape extends Activity {
 		distanceZ = (float) -(((heightY / Math.tan(Math.toRadians(FOV) / 2)) / 2) + DISTANCE_FROM_CLOSE_PLANE);
 		widthX = heightY * aspectRatio;
 		
+		
+		
+		ArrayList<Point> points = TrackPointDictionary.getInstance().getLevelPointList("FIRST");
+
 		Track track = new Track(new Point(0,0,0), new ImageSource(0,
 				R.drawable.track1, new Point(widthX, heightY, 0), new Point(
 						0, 0, 0)), points);
-		
 		
 		BoxCollision nexusCollision = new BoxCollision(new Point(5, 5, 5),
 				new Point(-2.5f, -2.5f, -2.5f));
@@ -209,7 +230,25 @@ public class Escape extends Activity {
 	private EngineCallback callback = new EngineCallback();
 
 	private class EngineCallback implements EngineTickCallback {
+		Handler innerHandler;
+		
+		public EngineCallback(){
+			(new Thread(new Runnable() {
+				public void run() {
+					Looper.prepare();
+					innerHandler = new Handler(){
+						@Override
+						public void handleMessage(Message msg) {
+							handler.sendMessage(msg);
+						};
+					};
 
+					Looper.loop();
+				}
+				
+			})).start();
+		}
+		
 		public void tick() {
 
 			if (placingTurret) {
@@ -228,10 +267,19 @@ public class Escape extends Activity {
 				currentTurret = null;
 				placedTurret = false;
 			}
-			//if(spawner.getEnemyDictionary())
+			if(game.getGameOver()){
+				Escape.this.finish();
+			}
+			if(game.getWaveOver()){
+				//engine.pause();
+				Message message = new Message();
+				message.obj = NEXT_WAVE;
+				innerHandler.dispatchMessage(message);
+			}
 		}
+		
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -250,48 +298,49 @@ public class Escape extends Activity {
          }
              return super.onOptionsItemSelected(item);
      }
-		
-	protected Dialog onCreateDialog(int id) {
-		Dialog dialog;
-		switch(id) {
-		case DIALOG_NEXT_WAVE_ID:
-			AlertDialog.Builder waveBuilder = new AlertDialog.Builder(this);
-			waveBuilder.setMessage("You beat the wave! Do you want to continue?")
-				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						//spawner.nextWave();
-						dialog.cancel();
-					}
-				})
-				.setNegativeButton("No", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						Escape.this.finish();
-					}
-				});
-			dialog = waveBuilder.create();
-			break;
-		case DIALOG_GAMEOVER_ID:
-			AlertDialog.Builder gameOverBuilder = new AlertDialog.Builder(this);
-			gameOverBuilder.setMessage("Game Over! Do you want to start over?")
-				.setCancelable(false)
-				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						//restart game
-					}
-				})
-				.setNegativeButton("No", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						Escape.this.finish();
-					}
-				});
-			dialog = gameOverBuilder.create();
-			break;
-		default:
-			dialog = null;
-		}
-		return dialog;
-	}
 	 
+		protected Dialog onCreateDialog(int id) {
+			Dialog dialog;
+			switch(id) {
+			case DIALOG_NEXT_WAVE_ID:
+				AlertDialog.Builder waveBuilder = new AlertDialog.Builder(this);
+				waveBuilder.setMessage("You beat the wave! Do you want to continue?")
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							game.nextWave();
+							dialog.dismiss();
+							engine.unpause();
+						}
+					})
+					.setNegativeButton("No", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							Escape.this.finish();
+						}
+					});
+				dialog = waveBuilder.create();
+				break;
+			case DIALOG_GAMEOVER_ID:
+				AlertDialog.Builder gameOverBuilder = new AlertDialog.Builder(this);
+				gameOverBuilder.setMessage("Game Over! Do you want to start over?")
+					.setCancelable(false)
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							game.resetGame();
+						}
+					})
+					.setNegativeButton("No", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							Escape.this.finish();
+						}
+					});
+				dialog = gameOverBuilder.create();
+				break;
+			default:
+				dialog = null;
+			}
+			return dialog;
+		}
+		
 		public static float getWidthX() {
 			return widthX;
 		}
