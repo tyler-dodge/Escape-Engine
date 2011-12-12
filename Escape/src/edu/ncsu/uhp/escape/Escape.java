@@ -6,6 +6,7 @@ import java.util.List;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,12 +14,17 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import edu.ncsu.uhp.escape.engine.Engine;
 import edu.ncsu.uhp.escape.engine.EngineTickCallback;
 import edu.ncsu.uhp.escape.engine.actor.BaseAttackTurret;
@@ -30,6 +36,7 @@ import edu.ncsu.uhp.escape.engine.actor.actions.DieAction;
 import edu.ncsu.uhp.escape.engine.actor.actions.PostMoveAction;
 import edu.ncsu.uhp.escape.engine.collision.BoxCollision;
 import edu.ncsu.uhp.escape.engine.collision.ICollision;
+import edu.ncsu.uhp.escape.engine.utilities.Graphic;
 import edu.ncsu.uhp.escape.engine.utilities.ImageSource;
 import edu.ncsu.uhp.escape.engine.utilities.TextGraphic;
 import edu.ncsu.uhp.escape.engine.utilities.TrackPointDictionary;
@@ -37,6 +44,7 @@ import edu.ncsu.uhp.escape.engine.utilities.ZAxisRotation;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
 import edu.ncsu.uhp.escape.game.actor.GameController;
 import edu.ncsu.uhp.escape.game.actor.Spawner;
+import edu.ncsu.uhp.escape.game.utilities.TurretOverlay;
 
 /**
  * This is the actual game in terms of setting up the map and actors. GUI events
@@ -79,7 +87,7 @@ public class Escape extends Activity {
 	private boolean placedTurret;
 	private boolean selectedTurret;
 	private Turret<?> currentTurret;
-	Dialog turretSelection;
+	private TurretOverlay turretSelection;
 
 
 	/**
@@ -87,6 +95,7 @@ public class Escape extends Activity {
 	 */
 	static final int DIALOG_NEXT_WAVE_ID = 0;
 	static final int DIALOG_GAMEOVER_ID = 1;
+	static final int TURRET_SELECTION_MENU = 2;
 	static final String NEXT_WAVE = "NEXT WAVE";
 	static final String GAME_OVER = "GAME OVER";
 
@@ -185,12 +194,16 @@ public class Escape extends Activity {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
-	    	if(turretSelection.isShowing()){
-	    		//turretSelection.hide();
-	    	} else{
-		    	//turretSelection.show();
+	    	if(turretSelection == null){
+				showDialog(TURRET_SELECTION_MENU);
+	    	}else{
+				if(turretSelection.isShowing()){
+					turretSelection.dismiss();
+				} else{
+					showDialog(TURRET_SELECTION_MENU);
+				}
 	    	}
-	        return false;
+	        return true;
 	        //Needs to be true!
 	    }
 	    return super.onKeyDown(keyCode, event);
@@ -228,11 +241,11 @@ public class Escape extends Activity {
 		nexusBox.add(nexusCollision);
 
 		Nexus nexus = new Nexus(new Point(widthX / 2 - 2, 0, 0),
-				new ZAxisRotation(0f), new ImageSource(0, R.drawable.nexusdemo,
+				new ZAxisRotation(0f), new ImageSource(0, R.drawable.nexus,
 						new Point(10, 5, 0), new Point(-5, -2.5f, 0)), nexusBox);
 
-		Spawner spawner = new Spawner(1, "FIRST");
-
+		Spawner spawner = new Spawner(1, "FIRST");		
+		
 		game = new GameController(nexus, track, spawner);
 		engine.addActionObserver(spawner);
 		engine.addActor(track);
@@ -241,20 +254,25 @@ public class Escape extends Activity {
 
 		engineLoopThread = new Thread(engine);
 		engineLoopThread.start();
-		engine.addGraphic(new TextGraphic(new Point(0, 0, 0), "Test", 3, 255,
+		engine.addGraphic(new TextGraphic(new Point(widthX - 30.8f, heightY - 5.45f, 0), "Money:", 2.3f, 255,
+				0, 0, 255));
+		engine.addGraphic(new TextGraphic(new Point(widthX - 15, heightY - 5, 0), "Health:", 1.85f, 255,
 				0, 0, 255));
 		engine.setGlSurface(glSurface);
 		engine.setTickCallback(callback);
-		
-		turretSelection = new Dialog(this, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
-		turretSelection.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-		         WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-		turretSelection.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-		         WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
-		turretSelection.setContentView(R.layout.custom_dialog);
-		//turretSelection.show();
-	}
 
+}
+
+
+	public void selectTurret(View view){
+		view.findViewById(R.id.ImageButton1);
+		if(game.getMoney() >= BaseAttackTurret.BASE_ATTACK_TURRET_COST){
+			selectedTurret = true;
+			game.spendMoney(BaseAttackTurret.BASE_ATTACK_TURRET_COST);
+		}
+		turretSelection.dismiss();
+	}
+	
 	private EngineCallback callback = new EngineCallback();
 
 	private class EngineCallback implements EngineTickCallback {
@@ -262,6 +280,10 @@ public class Escape extends Activity {
 		private Thread looperThread;
 		public static final int TERMINATE_LOOPER = 1;
 		public static final int CONTINUE_LOOPER = 0;
+		private int health;
+		private int money;
+		private Graphic healthGraphic;
+		private Graphic moneyGraphic;
 
 		public EngineCallback() {
 			looperThread = new Thread(new Runnable() {
@@ -303,6 +325,7 @@ public class Escape extends Activity {
 				placingTurret = false;
 				if(!currentTurret.placeable()){
 					engine.pushAction(new DieAction(engine, currentTurret));
+					game.addMoney(BaseAttackTurret.BASE_ATTACK_TURRET_COST);
 				}else{
 					currentTurret.place();
 				}
@@ -312,6 +335,21 @@ public class Escape extends Activity {
 			if(game.getGameOver()){
 				Escape.this.finish();
 			}
+			if(game.getGUIValuesChanged()){
+				if(money != game.getMoney()){
+					money = game.getMoney();
+					engine.removeGraphic(moneyGraphic);
+					moneyGraphic = new TextGraphic(new Point(widthX - 22.9f, heightY - 5, 0), String.valueOf(money), 2, 255,0, 0, 255);
+					engine.addGraphic(moneyGraphic);
+				}
+				if(health != game.getHealth()){
+					health = game.getHealth();
+					engine.removeGraphic(healthGraphic);
+					healthGraphic = new TextGraphic(new Point(widthX - 7, heightY - 5, 0), String.valueOf(health), 2, 255,0, 0, 255);
+					engine.addGraphic(healthGraphic);
+				}
+				game.setGUIValuesChanged(false);
+			}
 			if(game.getWaveOver()){
 				//engine.pause();
 				Message message = new Message();
@@ -320,23 +358,6 @@ public class Escape extends Activity {
 			}
 		}
 
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.layout.turret_overlay, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case 0:
-			selectedTurret = true;
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
 	}
 
 	protected Dialog onCreateDialog(int id) {
@@ -352,7 +373,7 @@ public class Escape extends Activity {
 										int id) {
 									game.nextWave();
 									dialog.dismiss();
-									engine.unpause();
+									//engine.unpause();
 								}
 							})
 					.setNegativeButton("No",
@@ -384,6 +405,16 @@ public class Escape extends Activity {
 								}
 							});
 			dialog = gameOverBuilder.create();
+			break;
+		case TURRET_SELECTION_MENU:
+			turretSelection = new TurretOverlay(this, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+			turretSelection.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+				WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+			turretSelection.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+				WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+			turretSelection.setContentView(R.layout.turret_overlay);
+			turretSelection.setOwnerActivity(this);
+			dialog = turretSelection;
 			break;
 		default:
 			dialog = null;
