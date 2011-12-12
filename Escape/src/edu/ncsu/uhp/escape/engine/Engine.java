@@ -203,6 +203,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		// the additional 1 is for the map
 		Profiler.getInstance().startSection("Generate Renderables list");
 		Queue<RenderableData> renderables;
+		actorLock.lock();
 		renderables = new LinkedList<RenderableData>();
 		if (map != null) {
 
@@ -227,6 +228,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 					gl), graphic.getPosition(), graphic.getRotation()));
 			;
 		}
+		actorLock.unlock();
 		Profiler.getInstance().endSection();
 		return renderables;
 	}
