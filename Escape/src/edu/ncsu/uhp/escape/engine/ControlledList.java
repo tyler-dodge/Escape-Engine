@@ -39,7 +39,7 @@ public class ControlledList<T> implements Iterable<T> {
 
 	public void remove(T actor) {
 		tempLock.lock();
-		toBeRemoved.remove(actor);
+		toBeRemoved.add(actor);
 		tempLock.unlock();
 	}
 
