@@ -31,7 +31,6 @@ public class MovementResponse<DataType extends Actor<?>> extends
 			owner.move(moveAction.getDirection());
 			PostMoveAction postMove = new PostMoveAction(owner,
 					moveAction.getOriginalPosition(), owner.getPosition());
-			owner.pushAction(postMove);
 		}
 		return superResponse;
 	}
