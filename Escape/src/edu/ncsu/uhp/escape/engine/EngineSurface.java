@@ -90,7 +90,6 @@ public class EngineSurface implements GLSurfaceView.Renderer {
 			}
 			
 			Queue<RenderableData> renderables = engine.getRenderables(gl);
-
 			if (version.equals("OpenGL ES-CM 1.1"))
 				renderList(new TargetGL11((GL11) gl), renderables);
 			else

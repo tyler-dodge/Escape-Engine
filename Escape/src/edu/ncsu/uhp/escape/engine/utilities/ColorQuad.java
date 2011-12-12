@@ -57,6 +57,7 @@ public class ColorQuad implements IRenderable {
 		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, verticesCount);
 		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnable(GL10.GL_BLEND);
+		gl.glEnable(GL10.GL_ALPHA);
 		gl.glPopMatrix();
 		Profiler.getInstance().endSection();
 	}
