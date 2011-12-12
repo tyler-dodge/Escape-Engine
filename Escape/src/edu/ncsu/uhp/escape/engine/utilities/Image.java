@@ -51,9 +51,12 @@ public class Image implements IRenderable {
 	private FloatBuffer getVertexBuffer(Point dimensions) {
 		float dimenX = dimensions.getX();
 		float dimenY = dimensions.getY();
-		float[] quadPoints = { 0.0f, dimenY, 0.0f, dimenX, dimenY, 0.0f, 0.0f,
-				0.0f, 0.0f, dimenX, 0.0f, 0.0f };
-
+		float[] quadPoints = { 
+				0.0f, dimenY, 0.0f,
+				0.0f, 0.0f, 0.0f,
+				dimenX,dimenY,0.0f,
+				dimenX, 0.0f, 0.0f, };
+		
 		FloatBuffer quad = ByteBuffer.allocateDirect(quadPoints.length * 4)
 				.order(ByteOrder.nativeOrder()).asFloatBuffer();
 		quad.put(quadPoints);

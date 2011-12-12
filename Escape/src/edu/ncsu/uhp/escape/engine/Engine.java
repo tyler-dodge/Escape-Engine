@@ -204,11 +204,6 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		Profiler.getInstance().startSection("Generate Renderables list");
 		Queue<RenderableData> renderables;
 		renderables = new LinkedList<RenderableData>();
-		for (Graphic graphic : graphics) {
-			renderables.add(new RenderableData(graphic.getRenderable(context,
-					gl), graphic.getPosition(), graphic.getRotation()));
-			;
-		}
 		if (map != null) {
 
 			renderables.add(new RenderableData(map.getRenderable(context, gl),
@@ -226,6 +221,11 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 							.getRotation()));
 				}
 			}
+		}
+		for (Graphic graphic : graphics) {
+			renderables.add(new RenderableData(graphic.getRenderable(context,
+					gl), graphic.getPosition(), graphic.getRotation()));
+			;
 		}
 		Profiler.getInstance().endSection();
 		return renderables;
