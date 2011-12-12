@@ -29,8 +29,6 @@ public class MovementResponse<DataType extends Actor<?>> extends
 		if (action instanceof MoveAction) {
 			MoveAction moveAction = (MoveAction) action;
 			owner.move(moveAction.getDirection());
-			PostMoveAction postMove = new PostMoveAction(owner,
-					moveAction.getOriginalPosition(), owner.getPosition());
 		}
 		return superResponse;
 	}
