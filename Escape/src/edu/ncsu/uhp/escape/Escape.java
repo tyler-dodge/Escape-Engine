@@ -31,6 +31,7 @@ import edu.ncsu.uhp.escape.engine.actor.actions.PostMoveAction;
 import edu.ncsu.uhp.escape.engine.collision.BoxCollision;
 import edu.ncsu.uhp.escape.engine.collision.ICollision;
 import edu.ncsu.uhp.escape.engine.utilities.ImageSource;
+import edu.ncsu.uhp.escape.engine.utilities.TextGraphic;
 import edu.ncsu.uhp.escape.engine.utilities.TrackPointDictionary;
 import edu.ncsu.uhp.escape.engine.utilities.ZAxisRotation;
 import edu.ncsu.uhp.escape.engine.utilities.math.Point;
@@ -223,6 +224,7 @@ public class Escape extends Activity {
 		
 		engineLoopThread = new Thread(engine);
 		engineLoopThread.start();
+		engine.addGraphic(new TextGraphic(new Point(0,0,0),"Test",3));
 		engine.setGlSurface(glSurface);
 		engine.setTickCallback(callback);
 	}

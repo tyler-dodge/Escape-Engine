@@ -11,7 +11,7 @@ public class Graphic {
 	private IRotation rotation;
 	private RenderSource source;
 
-	public Graphic(Point position, Point dimensions, IRotation rotation,
+	public Graphic(Point position, IRotation rotation,
 			RenderSource source) {
 		this.position = position;
 		this.dimensions = dimensions;
@@ -27,13 +27,6 @@ public class Graphic {
 		this.position = position;
 	}
 
-	public Point getDimensions() {
-		return dimensions;
-	}
-
-	public void setDimensions(Point dimensions) {
-		this.dimensions = dimensions;
-	}
 
 	public IRotation getRotation() {
 		return rotation;
