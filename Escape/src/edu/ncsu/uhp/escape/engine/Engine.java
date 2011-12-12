@@ -1,6 +1,5 @@
 package edu.ncsu.uhp.escape.engine;
 
-import edu.ncsu.uhp.escape.R;
 import edu.ncsu.uhp.escape.engine.actionresponse.BaseActionResponse;
 import edu.ncsu.uhp.escape.engine.actionresponse.IActionResponse;
 import edu.ncsu.uhp.escape.engine.actionresponse.engine.ActorDieResponse;
@@ -12,6 +11,7 @@ import edu.ncsu.uhp.escape.engine.actor.actions.Action;
 import edu.ncsu.uhp.escape.engine.actor.actions.EngineTickAction;
 import edu.ncsu.uhp.escape.engine.actor.actions.GravityAction;
 import edu.ncsu.uhp.escape.engine.collision.ICollision;
+import edu.ncsu.uhp.escape.engine.utilities.Graphic;
 import edu.ncsu.uhp.escape.engine.utilities.Profiler;
 import edu.ncsu.uhp.escape.engine.utilities.RenderableData;
 import edu.ncsu.uhp.escape.engine.utilities.ZAxisRotation;
@@ -26,7 +26,6 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 
-import edu.ncsu.uhp.escape.engine.map.*;
 import edu.ncsu.uhp.escape.engine.map.Map;
 
 /**
@@ -44,11 +43,6 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	private static final int ACTION_CAPACITY = 10;
 	private Actor<?> followActor;
 	private Lock actorLock = new ReentrantLock();
-	private Lock observerLock = new ReentrantLock();
-	private TemporaryQueue<Actor<?>> actorsToBeAdded;
-	private TemporaryQueue<Actor<?>> actorsToBeRemoved;
-	private TemporaryQueue<ActionObserver<?>> observersToBeAdded;
-	private TemporaryQueue<ActionObserver<?>> observersToBeRemoved;
 	private static final boolean RENDER_COLLISIONS = true;
 	private Context context;
 
@@ -61,11 +55,11 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	public Engine(Context context) {
 		super(ACTION_CAPACITY);
 		this.context = context;
-		actorsToBeAdded = new TemporaryQueue<Actor<?>>();
-		actorsToBeRemoved = new TemporaryQueue<Actor<?>>();
-		observersToBeAdded = new TemporaryQueue<ActionObserver<?>>();
-		observersToBeRemoved = new TemporaryQueue<ActionObserver<?>>();
-
+		actors = new ActionObserverList<Actor<?>>();
+		observers = new ActionObserverList<ActionObserver<?>>();
+		graphics = new ControlledList<Graphic>();
+		observers.addObservedList(actors);
+		actors.addObservedList(observers);
 	}
 
 	public void changeMap(Map<?> map) {
@@ -106,8 +100,9 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		context = null;
 	}
 
-	private ArrayList<Actor<?>> actors = new ArrayList<Actor<?>>();
-	private ArrayList<ActionObserver<?>> observers = new ArrayList<ActionObserver<?>>();
+	private ControlledList<Graphic> graphics;
+	private ActionObserverList<Actor<?>> actors;
+	private ActionObserverList<ActionObserver<?>> observers;
 	private Map<?> map;
 
 	/**
@@ -118,7 +113,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	 *            the actor to be added.
 	 */
 	public void addActor(Actor<?> newActor) {
-		actorsToBeAdded.enqueue(newActor);
+		actors.add(newActor);
 	}
 
 	/**
@@ -129,77 +124,23 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	 *            the actor to be removed
 	 */
 	public void removeActor(Actor<?> newActor) {
-		actorsToBeRemoved.enqueue(newActor);
+		actors.remove(newActor);
 	}
 
 	public void addActionObserver(ActionObserver<?> newObserver) {
-		observersToBeAdded.enqueue(newObserver);
+		observers.add(newObserver);
 	}
 
 	public void removeActionObserver(ActionObserver<?> oldObserver) {
-		observersToBeRemoved.enqueue(oldObserver);
+		observers.remove(oldObserver);
 	}
 
-	/**
-	 * Adds all the actors that are waiting to be added. Used so that the
-	 * addition of actors would be threadsafe, however this method itself is not
-	 * threadsafe so it must be enclosed by locks.
-	 */
-	private void addPendingActors() {
-		while (!actorsToBeAdded.isEmpty()) {
-			Actor<?> newActor = actorsToBeAdded.dequeue();
-			newActor.addObserver(this);
-			this.addObserver(newActor);
-			for (Actor<?> actor : actors) {
-				newActor.addObserver(actor);
-				actor.addObserver(newActor);
-			}
-			for (ActionObserver<?> observer : observers) {
-				newActor.addObserver(observer);
-				observer.addObserver(newActor);
-			}
-			actors.add(newActor);
-		}
+	public void addGraphic(Graphic graphic) {
+		graphics.add(graphic);
 	}
 
-	/**
-	 * Removes all the actors that are waiting to be removed. Used so that the
-	 * removal of actors would be threadsafe, however this method itself is not
-	 * threadsafe so it must be enclosed by locks.
-	 */
-	private void removePendingActors() {
-		while (!actorsToBeRemoved.isEmpty()) {
-			Actor<?> newActor = actorsToBeRemoved.dequeue();
-			newActor.deleteObservers();
-			this.deleteObserver(newActor);
-			actors.remove(newActor);
-		}
-	}
-
-	private void addPendingObservers() {
-		while (!observersToBeAdded.isEmpty()) {
-			ActionObserver<?> newObserver = observersToBeAdded.dequeue();
-			newObserver.addObserver(this);
-			this.addObserver(newObserver);
-			for (ActionObserver<?> observer : observers) {
-				newObserver.addObserver(observer);
-				observer.addObserver(newObserver);
-			}
-			for (Actor<?> actor : actors) {
-				newObserver.addObserver(actor);
-				actor.addObserver(newObserver);
-			}
-			observers.add(newObserver);
-		}
-	}
-
-	private void removePendingObservers() {
-		while (!observersToBeRemoved.isEmpty()) {
-			ActionObserver<?> newObserver = observersToBeRemoved.dequeue();
-			newObserver.deleteObservers();
-			this.deleteObserver(newObserver);
-			observers.remove(newObserver);
-		}
+	public void removeGraphic(Graphic graphic) {
+		graphics.remove(graphic);
 	}
 
 	/**
@@ -212,11 +153,10 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		Profiler.getInstance().incrementFrame();
 		Profiler.getInstance().startSection("eval actions");
 		actorLock.lock();
-		observerLock.lock();
-		addPendingActors();
-		removePendingActors();
-		addPendingObservers();
-		removePendingObservers();
+		actors.flush(this);
+		observers.flush(this);
+		graphics.flush();
+		actorLock.unlock();
 		Action<?>[] actions = createEngineIterationActions();
 		for (Action<?> action : actions) {
 			this.pushAction(action);
@@ -249,8 +189,6 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 		Profiler.getInstance().startSection("Engine eval action");
 		evalActions();
 		Profiler.getInstance().endSection();
-		actorLock.unlock();
-		observerLock.unlock();
 		Profiler.getInstance().endSection();
 	}
 
@@ -264,10 +202,13 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	public Queue<RenderableData> getRenderables(GL10 gl) {
 		// the additional 1 is for the map
 		Profiler.getInstance().startSection("Generate Renderables list");
-		actorLock.lock();
 		Queue<RenderableData> renderables;
 		renderables = new LinkedList<RenderableData>();
-
+		for (Graphic graphic : graphics) {
+			renderables.add(new RenderableData(graphic.getRenderable(context,
+					gl), graphic.getPosition(), graphic.getRotation()));
+			;
+		}
 		if (map != null) {
 
 			renderables.add(new RenderableData(map.getRenderable(context, gl),
@@ -286,7 +227,6 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 				}
 			}
 		}
-		actorLock.unlock();
 		Profiler.getInstance().endSection();
 		return renderables;
 	}
@@ -380,7 +320,7 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	 * Runs the engine in the current thread. Since the Engine implements
 	 * Runnable, this can be used as the entry point for a thread.
 	 */
-	public void run() { 
+	public void run() {
 		FrameLimiter limiter = new FrameLimiter();
 		while (!isFinalized && !isPaused) {
 			if (callback != null)
@@ -404,39 +344,6 @@ public class Engine extends ActionObserver<Engine> implements Runnable {
 	@Override
 	public Engine asDataType() {
 		return this;
-	}
-
-	/**
-	 * A thread safe queue used to contain Temporary actors.
-	 * 
-	 * @author Tyler Dodge
-	 * 
-	 */
-	private class TemporaryQueue<T> {
-		private Queue<T> actors;
-		private Lock tempLock;
-
-		public TemporaryQueue() {
-			tempLock = new ReentrantLock();
-			actors = new LinkedList<T>();
-		}
-
-		public boolean isEmpty() {
-			return actors.isEmpty();
-		}
-
-		public void enqueue(T actor) {
-			tempLock.lock();
-			actors.add(actor);
-			tempLock.unlock();
-		}
-
-		public T dequeue() {
-			tempLock.lock();
-			T actor = actors.remove();
-			tempLock.unlock();
-			return actor;
-		}
 	}
 
 }
