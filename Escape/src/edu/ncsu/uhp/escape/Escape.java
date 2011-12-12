@@ -241,8 +241,8 @@ public class Escape extends Activity {
 		nexusBox.add(nexusCollision);
 
 		Nexus nexus = new Nexus(new Point(widthX / 2 - 2, 0, 0),
-				new ZAxisRotation(0f), new ImageSource(0, R.drawable.nexus,
-						new Point(10, 5, 0), new Point(-5, -2.5f, 0)), nexusBox);
+				new ZAxisRotation(0f), new ImageSource(0, R.drawable.turret,
+						new Point(10, 10, 0), new Point(-5, -5, 0)), nexusBox);
 
 		Spawner spawner = new Spawner(1, "FIRST");		
 		

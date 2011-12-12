@@ -30,6 +30,16 @@
 		android:src="@drawable/turret"
 		android:onClick="selectTurret"
 	/>
-
+	
+	<TextView android:id="@+id/cost"
+		android:layout_gravity="bottom|right"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginRight="67dip"
+		android:layout_marginBottom="35dip"
+		android:textSize="12sp"
+		android:textStyle="bold"
+		android:textColor="#FFFF00"
+		android:text="400" />
 
 </FrameLayout>
