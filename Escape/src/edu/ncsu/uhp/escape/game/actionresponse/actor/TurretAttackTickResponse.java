@@ -1,5 +1,6 @@
 package edu.ncsu.uhp.escape.game.actionresponse.actor;
 
+import java.util.LinkedList;
 import java.util.Set;
 
 import edu.ncsu.uhp.escape.engine.actionresponse.IActionResponse;
@@ -8,6 +9,7 @@ import edu.ncsu.uhp.escape.engine.actor.Enemy;
 import edu.ncsu.uhp.escape.engine.actor.Turret;
 import edu.ncsu.uhp.escape.engine.actor.actions.Action;
 import edu.ncsu.uhp.escape.engine.actor.actions.EngineTickAction;
+import edu.ncsu.uhp.escape.engine.collision.ICollidable;
 
 public class TurretAttackTickResponse<DataType extends Turret<?>> extends SingleEvalActionResponseDecorator<DataType> {
 
@@ -31,12 +33,18 @@ public class TurretAttackTickResponse<DataType extends Turret<?>> extends Single
 				currentTick++;
 				if(currentTick == ticksBetweenSpawns){
 					currentTick = 0;
-					for(Enemy<?> enemy : enemies) {
-						if(owner.isWithinRange(enemy)){
-							owner.attack(enemy);
-							return false;
+					LinkedList<ICollidable> enemiesToRemove = new LinkedList<ICollidable>();
+					synchronized(enemies){
+						for(Enemy<?> enemy : enemies) {
+							if(owner.isWithinRange(enemy)){
+								owner.attack(enemy);
+								return false;
+							}
+							else{
+								enemiesToRemove.add(enemy);
+							}
 						}
-						else{
+						for(ICollidable enemy : enemiesToRemove){
 							enemies.remove(enemy);
 						}
 					}
