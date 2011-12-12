@@ -217,10 +217,10 @@ public class Escape extends Activity {
 		Spawner spawner = new Spawner(1, "FIRST");
 		
 		game = new GameController(nexus, track, spawner);
-		engine.pushAction(new CreateObserverAction(engine, spawner));
-		engine.pushAction(new CreateActorAction(engine, track));
-		engine.pushAction(new CreateActorAction(engine, nexus));
-		engine.pushAction(new CreateObserverAction(engine, game));
+		engine.addActionObserver(spawner);
+		engine.addActor(track);
+		engine.addActor(nexus);
+		engine.addActionObserver(game);
 		
 		engineLoopThread = new Thread(engine);
 		engineLoopThread.start();
