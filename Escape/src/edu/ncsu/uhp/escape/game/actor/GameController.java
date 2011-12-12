@@ -9,6 +9,7 @@ import edu.ncsu.uhp.escape.engine.actor.Enemy;
 import edu.ncsu.uhp.escape.engine.actor.Nexus;
 import edu.ncsu.uhp.escape.engine.actor.Track;
 import edu.ncsu.uhp.escape.game.actionresponse.actor.EnemyDeathResponse;
+import edu.ncsu.uhp.escape.game.actionresponse.actor.LoseHealthResponse;
 import edu.ncsu.uhp.escape.game.actionresponse.actor.SpawnerTickResponse;
 
 /**
@@ -26,6 +27,8 @@ public class GameController extends ActionObserver<GameController>{
 	private int health = 100;
 	private int money = 500;
 
+	private boolean GUIValuesChanged = true;
+	
 	private ArrayList<Enemy<?>> activeEnemies = new ArrayList<Enemy<?>>();
 	
 	public GameController(int capacity, Nexus nexus, Track track, Spawner spawner) {
@@ -37,6 +40,14 @@ public class GameController extends ActionObserver<GameController>{
 
 	public GameController(Nexus nexus, Track track, Spawner spawner){
 		this(ACTION_CAPACITY, nexus, track, spawner);
+	}
+	
+	public boolean getGUIValuesChanged(){
+		return this.GUIValuesChanged;
+	}
+	
+	public void setGUIValuesChanged(boolean GUIValuesChanged){
+		this.GUIValuesChanged = GUIValuesChanged;
 	}
 	
 	public boolean getWaveOver(){
@@ -52,6 +63,7 @@ public class GameController extends ActionObserver<GameController>{
 		spawner.nextWave();
 		health = 100;
 		money = 500;
+		GUIValuesChanged = true;
 	}
 	
 	@Override
@@ -64,6 +76,7 @@ public class GameController extends ActionObserver<GameController>{
 		IActionResponse<GameController> responder = new BaseActionResponse<GameController>();
 		responder = new SpawnerTickResponse(responder);
 		responder = new EnemyDeathResponse(responder);
+		responder = new LoseHealthResponse(responder);
 		return responder;
 	} 
 	
@@ -73,14 +86,17 @@ public class GameController extends ActionObserver<GameController>{
 
 	public void setHealth(int health) {
 		this.health = health;
+		GUIValuesChanged = true;
 	}
 	
 	public void damageHealth(int health){
 		this.health = this.health - health;
+		GUIValuesChanged = true;
 	}
 	
 	public void addHealth(int health){
 		this.health = this.health + health;
+		GUIValuesChanged = true;
 	}
 
 	public int getMoney() {
@@ -89,10 +105,17 @@ public class GameController extends ActionObserver<GameController>{
 
 	public void setMoney(int money) {
 		this.money = money;
+		GUIValuesChanged = true;
 	}
 	
 	public void addMoney(int money){
 		this.money = this.money + money;
+		GUIValuesChanged = true;
+	}
+	
+	public void spendMoney(int money){
+		this.money = this.money - money;
+		GUIValuesChanged = true;
 	}
 
 	public ArrayList<Enemy<?>> getActiveEnemies() {

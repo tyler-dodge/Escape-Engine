@@ -162,4 +162,6 @@ public abstract class Turret<DataType extends Turret<DataType>> extends
 		placed = true;
 	}
 	
+	public abstract int getCost();
+	
 }

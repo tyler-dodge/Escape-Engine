@@ -22,6 +22,8 @@ import edu.ncsu.uhp.escape.game.utilities.TurretCollision;
  */
 public class BaseAttackTurret extends Turret<BaseAttackTurret> {
 	
+	public final static int BASE_ATTACK_TURRET_COST = 400;
+	
 	public static Point RANGE_DIMENSION = new Point(20, 20, 1);
 	public static Point RANGE_OFFSET = new Point(-10, -10, 0);
 	
@@ -67,5 +69,8 @@ public class BaseAttackTurret extends Turret<BaseAttackTurret> {
 		pushAction(new CreateActorAction(this, new Fireball(getPosition(), new ZAxisRotation(angle), new ImageSource(0, R.drawable.fireball_actor, new Point(5, 5, 0), new Point(-2.5f, -2.5f, 1)), box)));
 	}
 	
+	public int getCost(){
+		return BASE_ATTACK_TURRET_COST;
+	}
 	
 }

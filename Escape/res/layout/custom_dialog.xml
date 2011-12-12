@@ -1,17 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:id="@+id/layout_root"
-android:orientation="vertical"
-android:layout_width="fill_parent"
-android:layout_height="fill_parent"
-android:paddingLeft="10dip"
-android:paddingRight="10dip"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/layout_root"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:paddingLeft="10dip"
+	android:paddingRight="10dip"
 >
-<TextView
-android:id="@+id/textout"
-android:layout_width="fill_parent"
-android:layout_height="wrap_content"
-android:text="OK"
+	<ImageView
+		android:layout_gravity="bottom|right"
+		android:scaleType="fitCenter"
+		android:layout_width="120dip"
+		android:layout_height="120dip"
+		android:background="@android:color/transparent"
+		android:src="@drawable/turret_selection"
+	/>
+	
+	<ImageButton
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_gravity="bottom|right"
+		android:id="@+id/ImageButton1"
+		android:scaleType="fitCenter"
+		android:layout_width="35dip"
+		android:layout_height="35dip"
+		android:layout_marginRight="75dip"
+		android:layout_marginBottom="40dip"
+		android:background="@android:color/transparent"
+		android:src="@drawable/turret"
+		android:onClick="selectTurret"
+	/>
 
-/>
-</LinearLayout>
+
+</FrameLayout>
