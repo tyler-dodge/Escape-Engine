@@ -36,5 +36,9 @@ public class MultiRenderableSource extends RenderSource {
 	public Point getOffsets() {
 		return offsets;
 	}
+	
+	public RenderSource[] getSources(){
+		return this.sources;
+	}
 
 }

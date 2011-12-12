@@ -19,6 +19,7 @@ import edu.ncsu.uhp.escape.game.actionresponse.actor.EnemyDeathTurretResponse;
 import edu.ncsu.uhp.escape.game.actionresponse.actor.TurretAttackTickResponse;
 import edu.ncsu.uhp.escape.game.actionresponse.actor.TurretCollisionResponse;
 import edu.ncsu.uhp.escape.game.utilities.TurretCollision;
+import edu.ncsu.uhp.escape.game.utilities.TurretRenderableSource;
 
 /**
  * Extension of NPC for turrets
@@ -35,17 +36,19 @@ public abstract class Turret<DataType extends Turret<DataType>> extends
 	private Set<Enemy<?>> enemiesInRange = Collections.synchronizedSet(new LinkedHashSet<Enemy<?>>());
 	private boolean colliding;
 	private boolean placed;
+	private RenderSource source;
 	
 	/**
 	 * Constructs a Turret with a range
 	 */
 	public Turret(Point position,
 			IRotation rotation, RenderSource source,
-			List<ICollision> collision, Point rangeDimension, Point rangeOffset) {
+			List<ICollision> collision, TurretCollision rangeCollision) {
 		super(position, rotation, source, collision);
-		this.rangeCollision = new TurretCollision(rangeDimension, rangeOffset, 0, 255, 0, 50);	
-		//Used to show range for now.
-		//getCollision().add(rangeCollision);
+		this.rangeCollision = rangeCollision;
+		this.source = source;
+		setSource(new TurretRenderableSource( 0, new RenderSource[]{ 
+				source}, new Point(0,0,0), rangeCollision));
 	}
 	
 	@Override
@@ -99,6 +102,7 @@ public abstract class Turret<DataType extends Turret<DataType>> extends
 	public void setColor(ICollidable observer){
 		collidingWith.add(observer);
 		rangeCollision.changeColor(255, 0, 0, 50);
+		getSource().reload();
 		colliding = true;
 	}
 	
@@ -121,8 +125,10 @@ public abstract class Turret<DataType extends Turret<DataType>> extends
 			synchronized(collidingWith){
 				for(ICollidable observer : collidingWith){
 					if(colliding == false && this.doesCollide(observer)){
-						observersToRemove.add(observer);
 						colliding = true;
+					}
+					else{
+						observersToRemove.add(observer);
 					}
 				}
 				for(ICollidable observer : observersToRemove){
@@ -131,6 +137,7 @@ public abstract class Turret<DataType extends Turret<DataType>> extends
 			}
 			if(colliding == false){
 				rangeCollision.changeColor(0, 255, 0, 150);
+				getSource().reload();
 			}
 			colliding = false;
 		}
@@ -151,6 +158,7 @@ public abstract class Turret<DataType extends Turret<DataType>> extends
 	}
 	
 	public void place(){
+		setSource(source);
 		placed = true;
 	}
 	
