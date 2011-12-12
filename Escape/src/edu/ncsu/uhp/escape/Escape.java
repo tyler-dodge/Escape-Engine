@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -78,6 +79,8 @@ public class Escape extends Activity {
 	private boolean placedTurret;
 	private boolean selectedTurret;
 	private Turret<?> currentTurret;
+	Dialog turretSelection;
+
 
 	/**
 	 * Popup Dialogue constants
@@ -94,10 +97,10 @@ public class Escape extends Activity {
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			String event = (msg.obj == null) ? "" : msg.obj.toString();
-			if (event.equals(NEXT_WAVE)) {
+			String event = (msg.obj == null)? "" : msg.obj.toString();
+			if(event.equals(NEXT_WAVE)){
 				showDialog(DIALOG_NEXT_WAVE_ID);
-			} else if (event.equals(GAME_OVER)) {
+			}else if(event.equals(GAME_OVER)){
 				showDialog(DIALOG_GAMEOVER_ID);
 			}
 		}
@@ -153,16 +156,14 @@ public class Escape extends Activity {
 			float relX = event.getX() * ratioX;
 			float relY = (glSurface.getHeight() - event.getY()) * ratioY;
 
-			if (selectedTurret) {
-				BoxCollision collisionBox = new BoxCollision(
-						new Point(5, 5f, 5), new Point(-2.5f, -2.5f, -2.5f));
-				List<ICollision> box = new ArrayList<ICollision>();
-				box.add(collisionBox);
-
-				currentTurret = new BaseAttackTurret(new Point(relX, relY, 0),
-						new ZAxisRotation(1.57f), new ImageSource(0,
-								R.drawable.turret, new Point(5, 5f, 0),
-								new Point(-2.5f, -2.5f, 1)), box);
+			if(selectedTurret){
+					BoxCollision collisionBox = new BoxCollision(new Point(5, 5f, 5),
+							new Point(-2.5f, -2.5f, -2.5f));
+					List<ICollision> box = new ArrayList<ICollision>();
+					box.add(collisionBox);
+					
+					currentTurret = new BaseAttackTurret(new Point(relX, relY, 0), new ZAxisRotation(0),
+		    				new ImageSource(0, R.drawable.turret, new Point(5, 5f, 0), new Point(-2.5f, -2.5f, 1)), box);
 
 				engine.pushAction(new CreateActorAction(engine, currentTurret));
 				placingTurret = true;
@@ -175,12 +176,26 @@ public class Escape extends Activity {
 			}
 		} else if (event.getAction() == MotionEvent.ACTION_UP) {
 			if (currentTurret != null) {
-				placedTurret = true;
+					placedTurret = true;
 			}
 		}
 		return false;
 	}
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
+	    	if(turretSelection.isShowing()){
+	    		//turretSelection.hide();
+	    	} else{
+		    	//turretSelection.show();
+	    	}
+	        return false;
+	        //Needs to be true!
+	    }
+	    return super.onKeyDown(keyCode, event);
+	}
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -230,6 +245,14 @@ public class Escape extends Activity {
 				0, 0, 255));
 		engine.setGlSurface(glSurface);
 		engine.setTickCallback(callback);
+		
+		turretSelection = new Dialog(this, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+		turretSelection.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+		         WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+		turretSelection.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+		         WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+		turretSelection.setContentView(R.layout.custom_dialog);
+		//turretSelection.show();
 	}
 
 	private EngineCallback callback = new EngineCallback();
@@ -271,32 +294,28 @@ public class Escape extends Activity {
 		public void tick() {
 
 			if (placingTurret) {
-				// Always push and test for collision before setting the
-				// position or you will get "color change" lag for the turret
-				currentTurret.pushAction(new PostMoveAction(currentTurret,
-						currentTurret.getPosition(), new Point(turretRelX,
-								turretRelY, 1)));
+				//Always push and test for collision before setting the position or you will get "color change" lag for the turret
+				currentTurret.pushAction(new PostMoveAction(currentTurret, currentTurret.getPosition(), new Point(turretRelX, turretRelY, 1)));
 				currentTurret.testStillColliding();
 				currentTurret.setPosition(new Point(turretRelX, turretRelY, 1));
 			}
-			if (placedTurret) {
+			if(placedTurret){
 				placingTurret = false;
-				if (!currentTurret.placeable()) {
+				if(!currentTurret.placeable()){
 					engine.pushAction(new DieAction(engine, currentTurret));
-				} else {
+				}else{
 					currentTurret.place();
 				}
 				currentTurret = null;
 				placedTurret = false;
 			}
-			if (game.getGameOver()) {
+			if(game.getGameOver()){
 				Escape.this.finish();
 			}
-			if (game.getWaveOver()) {
-				// engine.pause();
+			if(game.getWaveOver()){
+				//engine.pause();
 				Message message = new Message();
 				message.obj = NEXT_WAVE;
-				message.arg1 = CONTINUE_LOOPER;
 				innerHandler.dispatchMessage(message);
 			}
 		}
