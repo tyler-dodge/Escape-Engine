@@ -224,7 +224,7 @@ public class Escape extends Activity {
 		
 		engineLoopThread = new Thread(engine);
 		engineLoopThread.start();
-		engine.addGraphic(new TextGraphic(new Point(0,0,0),"Test",3));
+		engine.addGraphic(new TextGraphic(new Point(0,0,0),"Test",3,255,0,0,255));
 		engine.setGlSurface(glSurface);
 		engine.setTickCallback(callback);
 	}
